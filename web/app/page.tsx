@@ -1,535 +1,713 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { useCallback, useMemo, useState } from "react";
+import Link from "next/link";
 
-import Board from "@/components/Board";
-import InputPanel, {
-  type InputHighlight,
-  type SourceTab,
-} from "@/components/InputPanel";
-import LoadingOverlay from "@/components/LoadingOverlay";
-import RightPanel from "@/components/RightPanel";
-import Sidebar from "@/components/Sidebar";
-import type {
-  ConsultItem,
-  ExtractResponse,
-  Stats,
-  SummarizeResponse,
-  SummaryData,
-} from "@/types/schema";
-import type { AutoActionResult } from "@/lib/mocks";
-
-const initialTranscript = `Client would like the Q3 operating review in final form by next Thursday.
-
-Maya will send the updated churn workbook after finance closes the month.
-
-We still need confirmation from the client PM on rollout sequencing for the pilot markets.
-
-There is a risk that legal review slips if procurement redlines are not resolved this week.
-`;
-
-const initialSourceText: Record<SourceTab, string> = {
-  Transcript: initialTranscript,
-  Email: `From: Sarah Chen <s.chen@acmecorp.com>
-To: Consulting team
-Subject: RE: Commercial strategy workstream — quick update
-
-Hi team, following up on our call. A few things:
-
-Legal has flagged the vendor contract renewal — we need sign-off from procurement before we can proceed. Targeting end of next week but this is at risk.
-
-Can someone own the competitive benchmarking deck? We promised the board a first draft by May 2.
-
-Also waiting on Marcus to confirm the go-live date for the APAC rollout. He was supposed to revert by yesterday.`,
-  Notes: `Whiteboard session — Apr 23
-
-Three priority areas agreed:
-- Pricing model needs rework before board presentation (owner: TBD, due May 5)
-- NPS data from Q2 still missing — blocked on analytics team access
-- Draft exec summary for CFO review by Apr 28 — JS taking point
-
-Open question: do we expand scope to include LATAM? Client leaning yes but no budget confirmed.`,
-};
-
-const emptyStats: Stats = {
-  total: 0,
-  waiting: 0,
-  blockers: 0,
-  risks: 0,
-};
-
-function computeStats(nextItems: ConsultItem[]): Stats {
-  return {
-    total: nextItems.length,
-    waiting: nextItems.filter((item) => item.waiting).length,
-    blockers: nextItems.filter((item) => item.kind === "blocker").length,
-    risks: nextItems.filter((item) => item.kind === "risk").length,
-  };
-}
-
-const seedItems: ConsultItem[] = [
-  {
-    id: "ACM-090",
-    title: "Confirm stakeholder list for steering committee",
-    kind: "task",
-    status: "todo",
-    owner: "JS",
-    ownerName: "Jordan S.",
-    due: "Mon",
-    dueFlag: "soon",
-    tags: ["stakeholders", "governance"],
-    waiting: false,
-    quote: null,
-  },
-  {
-    id: "ACM-091",
-    title: "Client to share Q2 NPS raw export",
-    kind: "waiting",
-    status: "waiting",
-    owner: "CL",
-    ownerName: "Client Lead (client)",
-    due: "ASAP",
-    dueFlag: null,
-    tags: ["data", "from-client"],
-    waiting: true,
-    quote: null,
-  },
-  {
-    id: "ACM-092",
-    title: "Flag scope creep risk on LATAM add-on",
-    kind: "risk",
-    status: "todo",
-    owner: "PM",
-    ownerName: "Program Mgmt",
-    due: "This week",
-    dueFlag: "soon",
-    tags: ["scope", "risk"],
-    waiting: false,
-    quote: null,
-  },
-];
-
-const seedStats = computeStats(seedItems);
-
-const loadingStepDurations = [600, 600, 600];
-const minimumParseOverlayMs = 2600;
-
-function delay(ms: number) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
-  });
-}
-
-export default function Home() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [sourcePanelOpen, setSourcePanelOpen] = useState(true);
-  const [hasParsed, setHasParsed] = useState(true);
-  const [sourceText, setSourceText] =
-    useState<Record<SourceTab, string>>(initialSourceText);
-  const [activeTab, setActiveTab] = useState<SourceTab>("Transcript");
-  const [items, setItems] = useState<ConsultItem[]>(seedItems);
-  const [stats, setStats] = useState<Stats>(seedStats);
-  const [summary, setSummary] = useState<SummaryData | null>(null);
-  const [digestIds, setDigestIds] = useState<string[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [isParsing, setIsParsing] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [summaryError, setSummaryError] = useState<string | null>(null);
-  const [isSummarizing, setIsSummarizing] = useState(false);
-  const [actionResults, setActionResults] = useState<
-    Record<string, AutoActionResult>
-  >({});
-  const [runningAction, setRunningAction] = useState<string | null>(null);
-
-  const currentSourceText = sourceText[activeTab];
-  const selectedItem = useMemo(
-    () => items.find((item) => item.id === selectedId) ?? null,
-    [items, selectedId],
-  );
-
-  const showRightPanel = hasParsed && (selectedId !== null || !sourcePanelOpen);
-  const transcriptHighlights = useMemo<InputHighlight[]>(
-    () =>
-      items
-        .filter((item) => item.quote)
-        .map((item) => ({
-          id: item.id,
-          kind: item.kind,
-          quote: item.quote ?? "",
-        })),
-    [items],
-  );
-  const densityClass = "gap-4 p-4";
-
-  const shellStyle = useMemo<CSSProperties>(
-    () =>
-      ({
-        "--sidebar-w": sidebarOpen ? "232px" : "48px",
-      }) as CSSProperties,
-    [sidebarOpen],
-  );
-
-  const workspaceStyle = useMemo<CSSProperties>(
-    () =>
-      ({
-        "--source-w": sourcePanelOpen ? "360px" : "0px",
-        "--right-w": showRightPanel ? "300px" : "0px",
-      }) as CSSProperties,
-    [showRightPanel, sourcePanelOpen],
-  );
-
-  const updateSourceText = useCallback(
-    (value: string) => {
-      setSourceText((current) => ({
-        ...current,
-        [activeTab]: value,
-      }));
-    },
-    [activeTab],
-  );
-
-  const handleBoardSelect = useCallback((id: string) => {
-    setSelectedId(id);
-    setSourcePanelOpen(false);
-  }, []);
-
-  const handleHighlightSelect = useCallback((id: string) => {
-    setActiveTab("Transcript");
-    setSelectedId(id);
-  }, []);
-
-  const handleBack = useCallback(() => {
-    setSelectedId(null);
-  }, []);
-
-  const toggleDigest = useCallback((id: string) => {
-    setDigestIds((current) =>
-      current.includes(id) ? current.filter((existing) => existing !== id) : [...current, id],
-    );
-  }, []);
-
-  const generateSummary = useCallback(async (nextItems: ConsultItem[]) => {
-    if (nextItems.length === 0) {
-      setSummary(null);
-      setSummaryError(null);
-      return;
-    }
-
-    setSummaryError(null);
-
-    const response = await fetch("/api/summarize", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ items: nextItems }),
-    });
-
-    const payload = (await response.json()) as SummarizeResponse & { error?: string };
-
-    if (!response.ok) {
-      throw new Error(payload.error ?? "Failed to generate executive summary.");
-    }
-
-    setSummary(payload);
-  }, []);
-
-  const handleAddItem = useCallback(
-    (status: ConsultItem["status"], title: string) => {
-      const nextItem: ConsultItem = {
-        id: `MAN-${Date.now()}`,
-        title,
-        kind: status === "waiting" ? "waiting" : "task",
-        status,
-        owner: "ME",
-        ownerName: "Me",
-        due: "",
-        dueFlag: null,
-        tags: ["manual"],
-        waiting: status === "waiting",
-        quote: null,
-      };
-
-      setItems((current) => {
-        const next = [...current, nextItem];
-        setStats(computeStats(next));
-        return next;
-      });
-    },
-    [],
-  );
-
-  const handleStatusChange = useCallback(
-    (id: string, status: ConsultItem["status"]) => {
-      setItems((current) => {
-        const next = current.map((item) =>
-          item.id === id ? { ...item, status } : item,
-        );
-        setStats(computeStats(next));
-        return next;
-      });
-    },
-    [],
-  );
-
-  const parseSourceTab = useCallback(
-    async (tab: SourceTab) => {
-      const input = sourceText[tab].trim();
-
-      if (!input || isParsing) {
-        return;
-      }
-
-      setIsParsing(true);
-      setCurrentStep(0);
-      setErrorMessage(null);
-      setSummaryError(null);
-      setSelectedId(null);
-      setSummary(null);
-      setDigestIds([]);
-
-      const stepTimers = loadingStepDurations.map((duration, index) =>
-        window.setTimeout(() => {
-          setCurrentStep(index + 1);
-        }, loadingStepDurations.slice(0, index + 1).reduce((sum, value) => sum + value, 0)),
-      );
-
-      try {
-        const [response] = await Promise.all([
-          fetch("/api/extract", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ input }),
-          }),
-          delay(minimumParseOverlayMs),
-        ]);
-
-        const payload = (await response.json()) as ExtractResponse & { error?: string };
-
-        if (!response.ok) {
-          throw new Error(payload.error ?? "Failed to extract structured items.");
-        }
-
-        setSourcePanelOpen(false);
-        setHasParsed(true);
-
-        setItems((current) => {
-          const map = new Map(current.map((item) => [item.id, item] as const));
-          for (const item of payload.items) {
-            map.set(item.id, item);
-          }
-          const merged = Array.from(map.values());
-          setStats(computeStats(merged));
-          return merged;
-        });
-      } catch (error) {
-        setErrorMessage(
-          error instanceof Error ? error.message : "Unexpected extraction error.",
-        );
-      } finally {
-        stepTimers.forEach((timer) => window.clearTimeout(timer));
-        setIsParsing(false);
-        setCurrentStep(0);
-      }
-    },
-    [generateSummary, isParsing, sourceText],
-  );
-
-  const handleGenerateSummary = useCallback(async () => {
-    if (isSummarizing) {
-      return;
-    }
-
-    setIsSummarizing(true);
-    setSummaryError(null);
-
-    try {
-      const digestItems = digestIds
-        .map((id) => items.find((item) => item.id === id))
-        .filter((item): item is ConsultItem => Boolean(item));
-      await generateSummary(digestItems);
-    } catch (error) {
-      setSummaryError(
-        error instanceof Error ? error.message : "Unexpected summarization error.",
-      );
-    } finally {
-      setIsSummarizing(false);
-    }
-  }, [digestIds, generateSummary, isSummarizing, items]);
-
-  const handleRunAction = useCallback(
-    async (itemId: string, action: string) => {
-      const key = `${itemId}:${action}`;
-
-      if (runningAction !== null) {
-        return;
-      }
-
-      setRunningAction(key);
-
-      try {
-        const item = items.find((i) => i.id === itemId);
-
-        const response = await fetch("/api/auto-action", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ item, action }),
-        });
-
-        const payload = (await response.json()) as AutoActionResult & {
-          error?: string;
-        };
-
-        if (!response.ok) {
-          throw new Error(payload.error ?? "Failed to run auto-action.");
-        }
-
-        setActionResults((current) => ({
-          ...current,
-          [key]: payload,
-        }));
-      } catch (error) {
-        setActionResults((current) => ({
-          ...current,
-          [key]: {
-            actionType: action,
-            label: "Error",
-            content:
-              error instanceof Error ? error.message : "Unexpected error.",
-            suggestedNext: "",
-          },
-        }));
-      } finally {
-        setRunningAction(null);
-      }
-    },
-    [items, runningAction],
-  );
-
-  const handleTabChange = useCallback((tab: SourceTab) => {
-    setActiveTab(tab);
-    setErrorMessage(null);
-  }, []);
-
-  const handleParse = useCallback(async () => {
-    await parseSourceTab(activeTab);
-  }, [activeTab, parseSourceTab]);
-
+export default function LandingPage() {
   return (
-    <main
-      className="relative h-screen overflow-hidden bg-bg p-3 text-fg"
-    >
+    <div className="min-h-screen bg-bg overflow-x-hidden">
       <div
-        className="grid h-full grid-cols-[var(--sidebar-w)_1fr] overflow-hidden rounded-shell border border-line bg-bg transition-[grid-template-columns] duration-200"
-        style={shellStyle}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 999,
+          pointerEvents: "none",
+          opacity: 0.035,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      <nav
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 48px",
+          height: 64,
+          borderBottom: "1px solid var(--line)",
+          background: "rgba(11,12,15,0.8)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+        }}
       >
-        <Sidebar
-          items={items}
-          collapsed={!sidebarOpen}
-          onToggle={() => setSidebarOpen((current) => !current)}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <img
+            src="/consultflow.png"
+            alt="ConsultFlow"
+            style={{ width: 36, height: 36, objectFit: "contain", borderRadius: 8 }}
+          />
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: 15,
+              color: "var(--fg)",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            ConsultFlow
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Link
+            href="/app"
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#0b0c0f",
+              textDecoration: "none",
+              padding: "8px 18px",
+              borderRadius: 6,
+              background: "var(--fg)",
+              letterSpacing: "0.01em",
+            }}
+          >
+            Open app
+          </Link>
+        </div>
+      </nav>
+
+      <section
+        style={{
+          paddingTop: 160,
+          paddingBottom: 120,
+          paddingLeft: 48,
+          paddingRight: 48,
+          position: "relative",
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: 80,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 700,
+            height: 340,
+            background:
+              "radial-gradient(ellipse at 50% 0%, rgba(124,122,255,0.22) 0%, transparent 65%)",
+            pointerEvents: "none",
+          }}
         />
 
-        <section className="grid min-h-0 min-w-0 grid-rows-[44px_1fr]">
-          <div className="flex items-center gap-3 border-b border-line px-4">
-            {!sourcePanelOpen ? (
-              <button
-                type="button"
-                onClick={() => setSourcePanelOpen(true)}
-                className="rounded-md border border-line bg-bg-2 px-2.5 py-1 text-xs text-fg-dim transition hover:border-line-2 hover:text-fg"
+        <div
+          style={{
+            maxWidth: 900,
+            margin: "0 auto",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "5px 14px",
+              borderRadius: 99,
+              border: "1px solid var(--line-2)",
+              background: "var(--bg-2)",
+              fontSize: 11,
+              fontFamily: "var(--font-jetbrains-mono), monospace",
+              color: "var(--fg-dim)",
+              marginBottom: 32,
+              letterSpacing: "0.06em",
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "var(--ok)",
+                boxShadow: "0 0 10px var(--ok)",
+                flexShrink: 0,
+              }}
+            />
+            Built for consulting teams
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: 36,
+            }}
+          >
+            <img
+              src="/consultflow.png"
+              alt="ConsultFlow"
+              style={{ width: 80, height: 80, objectFit: "contain" }}
+            />
+          </div>
+
+          <h1
+            style={{
+              fontSize: "clamp(42px, 6vw, 72px)",
+              fontWeight: 800,
+              color: "var(--fg)",
+              lineHeight: 1.0,
+              letterSpacing: "-0.035em",
+              margin: "0 0 24px",
+              textAlign: "center",
+            }}
+          >
+            Turn any conversation into action
+          </h1>
+
+          <p
+            style={{
+              fontSize: 17,
+              color: "var(--fg-dim)",
+              lineHeight: 1.65,
+              margin: "0 0 44px",
+              maxWidth: 540,
+              marginLeft: "auto",
+              marginRight: "auto",
+              textAlign: "center",
+            }}
+          >
+            Paste a transcript, email, or notes. ConsultFlow extracts action
+            items, flags blockers and risks, and generates a client digest you
+            can send directly.
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              justifyContent: "center",
+            }}
+          >
+            <Link
+              href="/app"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "12px 24px",
+                borderRadius: 8,
+                background: "var(--fg)",
+                color: "#0b0c0f",
+                fontWeight: 700,
+                fontSize: 13,
+                textDecoration: "none",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Start now
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                aria-hidden="true"
               >
-                Add source
-              </button>
-            ) : null}
-            <div>
-              <div className="flex items-center gap-2 text-sm text-fg-dim">
-                <span>Acme Corp</span>
-                <span className="text-fg-faint">/</span>
-                <span>Commercial strategy</span>
-                <span className="text-fg-faint">/</span>
-                <span className="text-fg">Q3 operating review</span>
+                <path
+                  d="M3 7h8M7.5 3.5 11 7l-3.5 3.5"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div
+        style={{
+          height: 1,
+          background: "var(--line)",
+          margin: "0 48px",
+        }}
+      />
+
+      <section
+        style={{
+          padding: "80px 48px",
+          maxWidth: 1100,
+          margin: "0 auto",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 1,
+            background: "var(--line)",
+            border: "1px solid var(--line)",
+            borderRadius: 14,
+            overflow: "hidden",
+          }}
+        >
+          {[
+            {
+              label: "Extract commitments",
+              desc: "You paste the transcript. We pull out every action item, owner, and due date.",
+              accent: "var(--accent)",
+            },
+            {
+              label: "Surface blockers",
+              desc: "Risks, waiting-on-client items, and blockers get classified and grouped automatically.",
+              accent: "var(--warn)",
+            },
+            {
+              label: "Client digest",
+              desc: "A structured summary: what's next from the client, what's next from us, what needs attention.",
+              accent: "var(--ok)",
+            },
+          ].map((feature, i) => (
+            <div
+              key={feature.label}
+              style={{
+                background: "var(--bg-1)",
+                padding: "36px 32px",
+                position: "relative",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2,
+                  background: feature.accent,
+                  opacity: 0.6,
+                }}
+              />
+              <div
+                style={{
+                  fontFamily: "var(--font-jetbrains-mono), monospace",
+                  fontSize: 11,
+                  color: feature.accent,
+                  fontWeight: 700,
+                  marginBottom: 16,
+                  letterSpacing: "0.08em",
+                  opacity: 0.8,
+                }}
+              >
+                0{i + 1}
               </div>
-              <div className="mt-0.5 text-[11px] uppercase tracking-[0.14em] text-fg-faint">
-                Session · Steering sync 14
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: "var(--fg)",
+                  marginBottom: 10,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {feature.label}
               </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "var(--fg-dim)",
+                  lineHeight: 1.65,
+                }}
+              >
+                {feature.desc}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section
+        style={{
+          padding: "40px 48px 100px",
+          maxWidth: 1100,
+          margin: "0 auto",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1.2fr",
+            gap: 80,
+            alignItems: "start",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+                marginBottom: 14,
+              }}
+            >
+              How it works
+            </div>
+            <h2
+              style={{
+                fontSize: 34,
+                fontWeight: 800,
+                color: "var(--fg)",
+                lineHeight: 1.1,
+                letterSpacing: "-0.03em",
+                margin: "0 0 18px",
+              }}
+            >
+              Transcript in. Digest out.
+            </h2>
+            <p
+              style={{
+                fontSize: 14,
+                color: "var(--fg-dim)",
+                lineHeight: 1.75,
+                margin: "0 0 40px",
+              }}
+            >
+              Drop a transcript, email chain, or whiteboard notes. We pull out
+              commitments, classify blockers and risks, and generate a digest
+              your client can act on.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              {[
+                { step: "01", title: "Paste your source" },
+                { step: "02", title: "Review the board" },
+                { step: "03", title: "Send the digest" },
+              ].map((item, i, arr) => (
+                <div key={item.step} style={{ display: "flex", gap: 16 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontFamily: "var(--font-jetbrains-mono), monospace",
+                        fontSize: 10,
+                        color: "var(--accent)",
+                        fontWeight: 700,
+                        width: 28,
+                        textAlign: "right",
+                      }}
+                    >
+                      {item.step}
+                    </div>
+                    {i < arr.length - 1 && (
+                      <div
+                        style={{
+                          width: 1,
+                          flex: 1,
+                          background: "var(--line)",
+                          margin: "6px 0",
+                          minHeight: 32,
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div style={{ paddingBottom: i < arr.length - 1 ? 20 : 0 }}>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "var(--fg)",
+                        marginTop: 4,
+                      }}
+                    >
+                      {item.title}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
           <div
-            className={`grid min-h-0 min-w-0 grid-cols-[var(--source-w)_1fr_var(--right-w)] ${densityClass}`}
-            style={workspaceStyle}
+            style={{
+              background: "var(--bg-1)",
+              border: "1px solid var(--line)",
+              borderRadius: 14,
+              overflow: "hidden",
+              boxShadow:
+                "0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,122,255,0.06)",
+            }}
           >
             <div
-              className="min-h-0 overflow-hidden transition-[width] duration-200"
-              style={{ width: "var(--source-w)" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "12px 16px",
+                borderBottom: "1px solid var(--line)",
+                background: "var(--bg-2)",
+              }}
             >
-              <InputPanel
-                value={currentSourceText}
-                onChange={updateSourceText}
-                onParse={handleParse}
-                isParsing={isParsing}
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-                onToggle={() => setSourcePanelOpen(false)}
-                attn
-                highlights={transcriptHighlights}
-                onHighlightSelect={handleHighlightSelect}
-              />
-            </div>
-
-            <div className="min-h-0">
-              <Board
-                items={items}
-                selectedId={selectedId}
-                onSelect={handleBoardSelect}
-                onAddItem={handleAddItem}
-                loading={isParsing}
-              />
-              {errorMessage ? (
-                <div className="mt-3 rounded-[8px] border border-[var(--danger-weak)] bg-[rgba(72,25,28,0.55)] px-3 py-2 text-sm text-danger">
-                  {errorMessage}
-                </div>
-              ) : null}
-            </div>
-
-            <div
-              className="min-h-0 overflow-hidden transition-[width] duration-200"
-              style={{ width: "var(--right-w)" }}
-            >
-              {showRightPanel ? (
-                <>
-                  <RightPanel
-                    items={items}
-                    summary={summary}
-                    digestIds={digestIds}
-                    selectedItem={selectedItem}
-                    onBack={handleBack}
-                    onStatusChange={handleStatusChange}
-                    onToggleDigest={toggleDigest}
-                    onGenerateSummary={handleGenerateSummary}
-                    isGeneratingSummary={isSummarizing}
-                    actionResults={actionResults}
-                    runningAction={runningAction}
-                    onRunAction={handleRunAction}
+              <div style={{ display: "flex", gap: 6 }}>
+                {["var(--danger)", "var(--warn)", "var(--ok)"].map((color) => (
+                  <div
+                    key={color}
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      background: color,
+                      opacity: 0.7,
+                    }}
                   />
-                  {summaryError ? (
-                    <div className="mt-3 rounded-[8px] border border-[var(--warn-weak)] bg-[rgba(65,46,17,0.5)] px-3 py-2 text-sm text-warn">
-                      {summaryError}
-                    </div>
-                  ) : null}
-                </>
-              ) : null}
+                ))}
+              </div>
+              <div
+                style={{
+                  flex: 1,
+                  height: 22,
+                  borderRadius: 5,
+                  background: "var(--bg-3)",
+                  border: "1px solid var(--line)",
+                }}
+              />
+            </div>
+
+            <div style={{ padding: "16px" }}>
+              <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+                {[
+                  { label: "Transcript", count: 3, active: true },
+                  { label: "Email", count: 4, active: false },
+                  { label: "Notes", count: 2, active: false },
+                ].map((tab) => (
+                  <div
+                    key={tab.label}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      padding: "4px 10px",
+                      borderRadius: 5,
+                      fontSize: 11,
+                      fontFamily: "var(--font-jetbrains-mono), monospace",
+                      background: tab.active ? "var(--bg-3)" : "transparent",
+                      color: tab.active ? "var(--fg)" : "var(--fg-faint)",
+                      border: tab.active
+                        ? "1px solid var(--line-2)"
+                        : "1px solid transparent",
+                    }}
+                  >
+                    {tab.label}
+                    <span style={{ color: "var(--fg-faint)", fontSize: 10 }}>
+                      {tab.count}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                {[
+                  { kind: "task", label: "ACM-001", width: "75%" },
+                  { kind: "blocker", label: "ACM-002", width: "60%" },
+                  { kind: "risk", label: "ACM-003", width: "82%" },
+                  { kind: "waiting", label: "ACM-004", width: "50%" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      padding: "9px 12px",
+                      borderRadius: 8,
+                      background: "var(--bg-2)",
+                      border: "1px solid var(--line)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: "50%",
+                        background:
+                          item.kind === "task"
+                            ? "var(--accent)"
+                            : item.kind === "blocker"
+                              ? "var(--danger)"
+                              : item.kind === "risk"
+                                ? "var(--warn)"
+                                : "var(--info)",
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontFamily: "var(--font-jetbrains-mono), monospace",
+                        color: "var(--fg-faint)",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                    <div
+                      style={{
+                        flex: 1,
+                        height: 7,
+                        borderRadius: 4,
+                        background: "var(--bg-3)",
+                        width: item.width,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  background: "var(--bg-2)",
+                  border: "1px solid var(--line)",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontFamily: "var(--font-jetbrains-mono), monospace",
+                    color: "var(--accent)",
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    marginBottom: 6,
+                  }}
+                >
+                  EXECUTIVE SUMMARY
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  {[85, 65, 90].map((w, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        height: 6,
+                        borderRadius: 3,
+                        background: "var(--bg-3)",
+                        width: `${w}%`,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      <LoadingOverlay visible={isParsing} currentStep={currentStep} />
-    </main>
+      <section
+        style={{
+          padding: "80px 48px",
+          borderTop: "1px solid var(--line)",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: 500, margin: "0 auto" }}>
+          <h2
+            style={{
+              fontSize: 32,
+              fontWeight: 800,
+              color: "var(--fg)",
+              letterSpacing: "-0.03em",
+              margin: "0 0 14px",
+            }}
+          >
+            Ready to try it?
+          </h2>
+          <p
+            style={{
+              fontSize: 14,
+              color: "var(--fg-dim)",
+              margin: "0 0 32px",
+              lineHeight: 1.65,
+            }}
+          >
+            Open the app and paste your next source document.
+          </p>
+          <Link
+            href="/app"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "13px 28px",
+              borderRadius: 8,
+              background: "var(--fg)",
+              color: "#0b0c0f",
+              fontWeight: 700,
+              fontSize: 13,
+              textDecoration: "none",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Launch app
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M3 7h8M7.5 3.5 11 7l-3.5 3.5"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+        </div>
+      </section>
+
+      <footer
+        style={{
+          borderTop: "1px solid var(--line)",
+          padding: "20px 48px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <img
+            src="/consultflow.png"
+            alt="ConsultFlow"
+            style={{
+              width: 22,
+              height: 22,
+              objectFit: "contain",
+              borderRadius: 5,
+            }}
+          />
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--fg-faint)",
+            }}
+          >
+            ConsultFlow
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: 11,
+            color: "var(--fg-faint)",
+            fontFamily: "var(--font-jetbrains-mono), monospace",
+          }}
+        >
+          consultflow.ai
+        </span>
+      </footer>
+    </div>
   );
 }

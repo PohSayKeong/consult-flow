@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type SidebarProps = {
   items: Array<{ kind: "task" | "blocker" | "risk" | "waiting"; waiting: boolean }>;
   collapsed: boolean;
@@ -5,10 +7,10 @@ type SidebarProps = {
 };
 
 const navBase = [
-  { label: "Inbox", icon: "◌" },
-  { label: "My Tasks", icon: "✓" },
-  { label: "Waiting on Client", icon: "↗" },
-  { label: "Risks", icon: "!" },
+  { label: "Inbox", icon: "◌", href: null },
+  { label: "My Tasks", icon: "✓", href: null },
+  { label: "Waiting on Client", icon: "↗", href: null },
+  { label: "Risks", icon: "!", href: null },
 ];
 
 const engagements = [
@@ -95,29 +97,38 @@ export default function Sidebar({ items, collapsed, onToggle }: SidebarProps) {
           </div>
         )}
         <div className={`space-y-1 ${collapsed ? "pt-1" : ""}`}>
-          {navItems.map((item, index) => (
-            <button
-              key={item.label}
-              type="button"
-              title={collapsed ? item.label : undefined}
-              aria-label={collapsed ? item.label : undefined}
-              className={`flex w-full items-center rounded-md text-left text-sm transition ${
-                collapsed ? "justify-center px-0 py-2" : "gap-3 px-3 py-2"
-              } ${
-                index === 0
-                  ? "bg-bg-2 text-fg"
-                  : "text-fg-dim hover:bg-bg-2 hover:text-fg"
-              }`}
-            >
-              <span className="mono w-4 text-center text-xs">{item.icon}</span>
-              {collapsed ? null : (
-                <>
-                  <span>{item.label}</span>
-                  <span className="ml-auto text-[11px] text-fg-mute">{item.count}</span>
-                </>
-              )}
-            </button>
-          ))}
+          {navItems.map((item, index) => {
+            const content = (
+              <button
+                key={item.label}
+                type="button"
+                title={collapsed ? item.label : undefined}
+                aria-label={collapsed ? item.label : undefined}
+                className={`flex w-full items-center rounded-md text-left text-sm transition ${
+                  collapsed ? "justify-center px-0 py-2" : "gap-3 px-3 py-2"
+                } ${
+                  index === 0
+                    ? "bg-bg-2 text-fg"
+                    : "text-fg-dim hover:bg-bg-2 hover:text-fg"
+                }`}
+              >
+                <span className="mono w-4 text-center text-xs">{item.icon}</span>
+                {collapsed ? null : (
+                  <>
+                    <span>{item.label}</span>
+                    <span className="ml-auto text-[11px] text-fg-mute">{item.count}</span>
+                  </>
+                )}
+              </button>
+            );
+            return item.href ? (
+              <Link key={item.label} href={item.href} style={{ display: "block" }}>
+                {content}
+              </Link>
+            ) : (
+              <div key={item.label}>{content}</div>
+            );
+          })}
         </div>
       </div>
 

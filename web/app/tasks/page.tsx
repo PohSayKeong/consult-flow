@@ -39,13 +39,13 @@ const STAGE_COLORS: Record<string, string> = {
 };
 
 function OwnerBadge({ owner }: { owner: string }) {
-  const isclaude = owner === "claude";
+  const isClaude = owner === "claude";
   return (
     <span
       style={{
-        background: isclaude ? "var(--accent-weak)" : "var(--info-weak)",
-        color: isclaude ? "var(--accent)" : "var(--info)",
-        border: `1px solid ${isclaude ? "var(--accent-weak)" : "var(--info-weak)"}`,
+        background: isClaude ? "var(--accent-weak)" : "var(--info-weak)",
+        color: isClaude ? "var(--accent)" : "var(--info)",
+        border: `1px solid ${isClaude ? "var(--accent-weak)" : "var(--info-weak)"}`,
         borderRadius: 4,
         padding: "1px 7px",
         fontSize: 11,
@@ -356,7 +356,7 @@ export default function TasksPage() {
           fontSize: 13,
         }}
       >
-        Loading…
+        Loading...
       </div>
     );
   }
@@ -375,7 +375,6 @@ export default function TasksPage() {
         gap: 20,
       }}
     >
-      {/* Header */}
       <div
         style={{
           display: "flex",
@@ -396,7 +395,7 @@ export default function TasksPage() {
             gap: 4,
           }}
         >
-          ← App
+          ← Home
         </Link>
         <div
           style={{
@@ -422,7 +421,6 @@ export default function TasksPage() {
           </div>
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 16 }}>
-          {/* Progress bar */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div
               style={{
@@ -456,7 +454,6 @@ export default function TasksPage() {
         </div>
       </div>
 
-      {/* Stage columns */}
       <div
         style={{
           display: "flex",
