@@ -15,8 +15,11 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ConsultFlow",
+  title: "ConsultFlow — AI Agent Coordination",
   description: "AI workflow assistant for consulting teams.",
+  icons: {
+    icon: "/consultflow.png",
+  },
 };
 
 export default function RootLayout({
