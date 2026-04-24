@@ -438,13 +438,13 @@
     },
     {
       "id": "TASK-038",
-      "title": "Card glow reacts to status=waiting not just waiting flag",
-      "description": "The Card component showed a cyan glow/border only when item.waiting was true, but not when item.status was changed to 'waiting' via the dropdown. Fixed by changing the condition from item.waiting to item.waiting || item.status === 'waiting' in both the card wrapper className and the left accent bar, and updating the kind badge display logic to show the 'awaiting' badge when status=waiting.",
-      "stage": "communicate",
-      "owner": "claude",
-      "status": "done",
+      "title": "Card glow color changes based on item status",
+      "description": "When a card's status changes via the dropdown, the glow color should reflect the current status:\n- status=waiting: cyan glow (bg-info, shadow-[0_0_10px_var(--info)])\n- status=doing: accent blue glow (bg-accent, shadow-[0_0_10px_var(--accent)])\n- status=done: green ok glow (bg-ok, shadow-[0_0_10px_var(--ok)])\n- status=todo: no glow\n\nThe glow is the left accent bar (absolute span) and the border color on the card wrapper. Extract a helper function in Card.tsx e.g. `getStatusGlow(status)` returning `{ border, bar }` or null for no glow. Use it in both the wrapper className and the bar element.",
+      "stage": "execute",
+      "owner": "codex",
+      "status": "todo",
       "dependencies": ["TASK-037", "TASK-021"],
-      "output": "Updated Card.tsx to react to item.status === 'waiting' in addition to item.waiting for the glow effect and badge display.",
+      "output": "",
       "files": ["web/components/Card.tsx"],
       "updated_at": "2026-04-24T18:30:00+0800"
     }
