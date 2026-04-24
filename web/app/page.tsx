@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import InputPanel, { SourceTab } from "@/components/InputPanel";
+import LoadingOverlay from "@/components/LoadingOverlay";
 import Sidebar from "@/components/Sidebar";
 
 type PrototypeItem = {
@@ -32,14 +33,24 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<SourceTab>("Transcript");
   const [sourceText, setSourceText] = useState(initialTranscript);
   const [isParsing, setIsParsing] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
 
   const handleParse = () => {
+    if (isParsing) {
+      return;
+    }
+
     setIsParsing(true);
-    window.setTimeout(() => setIsParsing(false), 1200);
+    setCurrentStep(0);
+
+    window.setTimeout(() => setCurrentStep(1), 350);
+    window.setTimeout(() => setCurrentStep(2), 700);
+    window.setTimeout(() => setCurrentStep(3), 1050);
+    window.setTimeout(() => setIsParsing(false), 1500);
   };
 
   return (
-    <main className="h-screen overflow-hidden bg-bg p-3 text-fg">
+    <main className="relative h-screen overflow-hidden bg-bg p-3 text-fg">
       <div className="grid h-full grid-cols-[232px_1fr] overflow-hidden rounded-shell border border-line bg-bg">
         <Sidebar items={items} />
 
@@ -51,6 +62,13 @@ export default function Home() {
               <span className="text-fg">Q3 operating review</span>
             </div>
             <div className="ml-auto flex items-center rounded-md border border-line bg-bg-1 p-1 text-xs text-fg-dim">
+              <button
+                type="button"
+                onClick={handleParse}
+                className="mr-2 rounded border border-line bg-bg-2 px-2 py-1 text-fg-dim transition hover:border-line-2 hover:text-fg"
+              >
+                Preview loading
+              </button>
               <span className="rounded px-2 py-1 text-fg">Board</span>
               <span className="px-2 py-1">List</span>
               <span className="px-2 py-1">Timeline</span>
@@ -168,6 +186,7 @@ export default function Home() {
           </div>
         </section>
       </div>
+      <LoadingOverlay visible={isParsing} currentStep={currentStep} />
     </main>
   );
 }
