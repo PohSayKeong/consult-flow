@@ -21,7 +21,10 @@ type RightPanelProps = {
   actionResults?: Record<string, AutoActionResult>;
   runningAction?: string | null;
   onRunAction?: (itemId: string, action: string) => void;
+  onActionsComplete?: (itemId: string) => void;
 };
+
+type ActionToConfirm = { itemId: string; action: string; label: string } | null;
 
 const ownerGradients: Record<string, string> = {
   LR: "from-[#f472b6] to-[#db2777]",
@@ -303,6 +306,7 @@ function DetailMode({
   actionResults,
   runningAction,
   onRunAction,
+  onActionsComplete,
 }: {
   item: ConsultItem;
   onBack: () => void;
@@ -312,18 +316,47 @@ function DetailMode({
   actionResults?: Record<string, AutoActionResult>;
   runningAction?: string | null;
   onRunAction?: (itemId: string, action: string) => void;
+  onActionsComplete?: (itemId: string) => void;
 }) {
+  const [actionToConfirm, setActionToConfirm] = useState<ActionToConfirm>(null);
+  const [showNextDelay, setShowNextDelay] = useState(false);
+  const [generatingKey, setGeneratingKey] = useState<string | null>(null);
+  const [actionsComplete, setActionsComplete] = useState(false);
   const meta = kindMeta[item.kind];
   const ownerGradient = ownerGradients[item.owner] ?? ownerGradients.MK;
 
-  const actions: { action: string; label: string }[] =
+  const actionSequence: { action: string; label: string }[] =
     item.kind === "task"
-      ? [{ action: "draft_memo", label: "Draft action memo" }]
+      ? [
+          { action: "draft_memo", label: "Draft action memo" },
+          { action: "draft_followup", label: "Draft follow-up" },
+          { action: "draft_update", label: "Draft status update" },
+        ]
       : item.kind === "waiting"
-        ? [{ action: "draft_nudge", label: "Draft nudge email" }]
+        ? [
+            { action: "draft_nudge", label: "Draft nudge email" },
+            { action: "draft_escalation", label: "Draft escalation" },
+            { action: "update_status", label: "Update status" },
+          ]
         : item.kind === "blocker"
-          ? [{ action: "escalation_note", label: "Write escalation note" }]
-          : [{ action: "risk_memo", label: "Write risk memo" }];
+          ? [
+              { action: "escalation_note", label: "Write escalation note" },
+              { action: "risk_memo", label: "Write risk memo" },
+              { action: "log_update", label: "Log update" },
+            ]
+          : [
+              { action: "risk_memo", label: "Write risk memo" },
+              { action: "mitigation_plan", label: "Create mitigation plan" },
+              { action: "escalation_note", label: "Write escalation note" },
+            ];
+
+  const completedCount = Math.min(
+    Object.keys(actionResults || {}).filter((key) => key.startsWith(item.id + ":")).length,
+    actionSequence.length,
+  );
+  const nextAction = actionSequence[completedCount];
+  const nextActionKey = nextAction ? `${item.id}:${nextAction.action}` : null;
+  const isRunningNext = runningAction === nextActionKey;
 
   return (
     <div className="p-4 text-[12.5px] text-fg">
@@ -420,37 +453,27 @@ function DetailMode({
             Automated actions
           </div>
           <div className="space-y-2">
-            {actions.map(({ action, label }) => {
+            {actionSequence.slice(0, completedCount).map(({ action, label }) => {
               const key = `${item.id}:${action}`;
-              const running = runningAction === key;
               const result = actionResults?.[key];
+              const isGenerating = generatingKey === key;
 
               return (
                 <div key={action}>
-                  <button
-                    type="button"
-                    onClick={() => onRunAction(item.id, action)}
-                    disabled={running}
-                    className="relative w-full rounded-md border border-line bg-bg-2 px-3 py-2 text-left text-sm text-fg-dim transition hover:border-line-2 hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <div className="flex items-center gap-2">
-                      {running ? (
-                        <svg
-                          className="h-3 w-3 animate-spin text-fg-mute"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <circle
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            strokeDasharray="31.4"
-                            strokeDashoffset="10"
-                          />
+                  <div className={`flex w-full items-center gap-2 rounded-md border px-3 py-2 text-left text-sm ${
+                    isGenerating 
+                      ? "border-line bg-bg-2 animate-pulse" 
+                      : "border-line-2 bg-bg-2 text-fg-mute opacity-60"
+                  }`}>
+                    {isGenerating ? (
+                      <>
+                        <svg className="h-3 w-3 animate-spin text-fg-mute" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" />
                         </svg>
-                      ) : result ? (
+                        <span className="text-fg-dim">Generating {label.toLowerCase()}...</span>
+                      </>
+                    ) : (
+                      <>
                         <svg
                           width="12"
                           height="12"
@@ -462,28 +485,12 @@ function DetailMode({
                         >
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
-                      ) : (
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          className="text-fg-mute"
-                        >
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="12" y1="8" x2="12" y2="12" />
-                          <line x1="12" y1="16" x2="12.01" y2="16" />
-                        </svg>
-                      )}
-                      <span className={running ? "text-fg-mute" : ""}>
-                        {running ? "Running…" : label}
-                      </span>
-                    </div>
-                  </button>
+                        <span>{label}</span>
+                      </>
+                    )}
+                  </div>
 
-                  {result ? (
+                  {!isGenerating && result ? (
                     <div className="mt-2 rounded-md border border-line bg-bg-1 p-3">
                       <div className="mb-2 whitespace-pre-wrap text-[12px] leading-relaxed text-fg">
                         {result.content}
@@ -499,6 +506,125 @@ function DetailMode({
                 </div>
               );
             })}
+
+            {showNextDelay && completedCount < actionSequence.length && (
+              <div className="flex items-center gap-2 rounded-md border border-line bg-bg-2 px-3 py-2">
+                <svg className="h-3 w-3 animate-spin text-fg-mute" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" />
+                </svg>
+                <span className="text-sm text-fg-mute">Preparing next action...</span>
+              </div>
+            )}
+
+            {nextAction && !showNextDelay && (
+              <button
+                type="button"
+                onClick={() =>
+                  setActionToConfirm({ itemId: item.id, action: nextAction.action, label: nextAction.label })
+                }
+                disabled={isRunningNext}
+                className="relative w-full rounded-md border border-line bg-bg-2 px-3 py-2 text-left text-sm text-fg-dim transition hover:border-line-2 hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <div className="flex items-center gap-2">
+                  {isRunningNext ? (
+                    <svg
+                      className="h-3 w-3 animate-spin text-fg-mute"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeDasharray="31.4"
+                        strokeDashoffset="10"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="text-fg-mute"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                  )}
+                  <span>{isRunningNext ? "Running…" : nextAction.label}</span>
+                </div>
+              </button>
+            )}
+
+            {completedCount >= actionSequence.length && item.status !== "done" && !actionsComplete && (
+              <div className="mt-3 rounded-md border border-dashed border-line bg-bg-1 p-3">
+                <div className="text-center">
+                  <div className="text-[11px] text-fg-faint">All actions completed</div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActionsComplete(true);
+                      onActionsComplete?.(item.id);
+                    }}
+                    className="mt-2 rounded-md border border-accent px-3 py-1.5 text-sm text-accent transition hover:bg-accent hover:text-bg"
+                  >
+                    Update status to "Done"
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {(actionsComplete || item.status === "done") && (
+              <div className="mt-3 flex items-center justify-center rounded-md border border-accent bg-bg-2 px-3 py-2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent mr-2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span className="text-sm text-accent">Status updated to Done</span>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
+
+      {actionToConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-[320px] rounded-lg border border-line bg-bg-2 p-4 shadow-xl">
+            <div className="text-base font-semibold text-fg">Run "{actionToConfirm.label}"?</div>
+            <div className="mt-2 text-sm text-fg-dim">
+              This will generate a {actionToConfirm.label.toLowerCase()} for this item.
+            </div>
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const key = `${actionToConfirm.itemId}:${actionToConfirm.action}`;
+                  setGeneratingKey(key);
+                  onRunAction?.(actionToConfirm.itemId, actionToConfirm.action);
+                  setActionToConfirm(null);
+                  setShowNextDelay(true);
+                  window.setTimeout(() => {
+                    setShowNextDelay(false);
+                    setGeneratingKey(null);
+                  }, 2000);
+                }}
+                className="flex-1 rounded-md bg-accent px-3 py-2 text-sm font-semibold text-bg transition hover:brightness-110"
+              >
+                Run
+              </button>
+              <button
+                type="button"
+                onClick={() => setActionToConfirm(null)}
+                className="flex-1 rounded-md border border-line bg-bg-1 px-3 py-2 text-sm text-fg-dim transition hover:border-line-2 hover:text-fg"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
@@ -551,6 +677,7 @@ export default function RightPanel({
   actionResults,
   runningAction,
   onRunAction,
+  onActionsComplete,
 }: RightPanelProps) {
   const [copied, setCopied] = useState(false);
 
@@ -619,6 +746,7 @@ export default function RightPanel({
             actionResults={actionResults}
             runningAction={runningAction}
             onRunAction={onRunAction}
+            onActionsComplete={onActionsComplete}
           />
         ) : (
           <SummaryMode

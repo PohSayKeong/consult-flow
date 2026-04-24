@@ -106,7 +106,7 @@ export function CardContent({ item, selected }: { item: ConsultItem; selected: b
           title={item.ownerName}
           className={`grid h-4 w-4 shrink-0 place-items-center rounded-full bg-gradient-to-br text-[9px] font-semibold text-white ${ownerGradient}`}
         >
-          {item.owner}
+          {item.owner.slice(0, 2)}
         </span>
         <span className={getDueClass(item.dueFlag)}>{item.due}</span>
         {item.tags[0] ? (

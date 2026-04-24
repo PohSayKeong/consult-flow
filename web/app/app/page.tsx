@@ -280,6 +280,13 @@ export default function Home() {
     [],
   );
 
+  const handleActionsComplete = useCallback(
+    (itemId: string) => {
+      handleStatusChange(itemId, "done");
+    },
+    [handleStatusChange],
+  );
+
   const handleSendEmail = useCallback(async () => {
     if (emailResult || isSendingEmail) return;
 
@@ -536,6 +543,7 @@ export default function Home() {
                     actionResults={actionResults}
                     runningAction={runningAction}
                     onRunAction={handleRunAction}
+                    onActionsComplete={handleActionsComplete}
                   />
                   {summaryError ? (
                     <div className="mt-3 rounded-[8px] border border-[var(--warn-weak)] bg-[rgba(65,46,17,0.5)] px-3 py-2 text-sm text-warn">
