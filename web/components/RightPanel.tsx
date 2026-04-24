@@ -6,9 +6,11 @@ import type { ConsultItem, SummaryData } from "@/types/schema";
 type RightPanelProps = {
   items: ConsultItem[];
   summary: SummaryData | null;
+  digestIds: string[];
   selectedItem: ConsultItem | null;
   onBack: () => void;
-  onRegenerate?: () => void;
+  onAddToDigest: (id: string) => void;
+  onGenerateDigest: () => void;
   isRegenerating?: boolean;
 };
 
@@ -53,13 +55,7 @@ const statusLabel: Record<ConsultItem["status"], string> = {
   done: "Done",
 };
 
-function summaryParagraphs(summary: SummaryData | null) {
-  if (!summary?.execSummary) {
-    return [
-      "Run extraction to generate an executive summary, client digest, and provenance trail for this session.",
-    ];
-  }
-
+function summaryParagraphs(summary: SummaryData) {
   return summary.execSummary
     .replaceAll("</p>", "")
     .split("<p>")
@@ -74,9 +70,15 @@ function digestValue(value: string | undefined) {
 function SummaryMode({
   items,
   summary,
+  digestIds,
+  onGenerateDigest,
+  isRegenerating,
 }: {
   items: ConsultItem[];
   summary: SummaryData | null;
+  digestIds: string[];
+  onGenerateDigest: () => void;
+  isRegenerating: boolean;
 }) {
   if (items.length === 0) {
     return (
@@ -97,22 +99,98 @@ function SummaryMode({
     );
   }
 
-  const total = items.length;
-  const waiting = items.filter((item) => item.waiting).length;
-  const blockers = items.filter((item) => item.kind === "blocker").length;
-  const risks = items.filter((item) => item.kind === "risk").length;
-  const done = items.filter((item) => item.status === "done").length;
-  const doing = items.filter((item) => item.status === "doing").length;
-  const waitingStatus = items.filter((item) => item.status === "waiting").length;
-  const todo = items.filter((item) => item.status === "todo").length;
+  if (digestIds.length === 0) {
+    return (
+      <div className="grid min-h-full place-items-center p-5">
+        <div className="max-w-[260px] rounded-xl border border-dashed border-line bg-bg-1 p-5 text-center">
+          <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+            Digest
+          </div>
+          <div className="mt-2 text-base font-semibold text-fg">
+            No items in digest yet
+          </div>
+          <p className="mt-3 text-sm leading-6 text-fg-dim">
+            Open a card and click <span className="text-fg">Add to digest</span> to get
+            started.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const pinnedItems = digestIds
+    .map((id) => items.find((item) => item.id === id))
+    .filter((item): item is ConsultItem => Boolean(item));
+
+  const total = pinnedItems.length;
+  const waiting = pinnedItems.filter((item) => item.waiting).length;
+  const blockers = pinnedItems.filter((item) => item.kind === "blocker").length;
+  const risks = pinnedItems.filter((item) => item.kind === "risk").length;
+  const done = pinnedItems.filter((item) => item.status === "done").length;
+  const doing = pinnedItems.filter((item) => item.status === "doing").length;
+  const waitingStatus = pinnedItems.filter((item) => item.status === "waiting").length;
+  const todo = pinnedItems.filter((item) => item.status === "todo").length;
   const denom = Math.max(total, 1);
   const movingPercent = Math.round(((done + doing) / denom) * 100);
 
-  const paragraphs = summaryParagraphs(summary);
+  const isGeneratePrimary = digestIds.length > 0 && !summary;
+  const paragraphs = summary ? summaryParagraphs(summary) : [];
   const digest = summary?.clientDigest;
 
   return (
     <div className="space-y-5 p-4">
+      <section className="rounded-[8px] border border-line bg-bg-2 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+              Digest items
+            </div>
+            <div className="mt-1 text-sm text-fg-dim">
+              Curated list for the client update
+            </div>
+          </div>
+          <span className="rounded-full border border-line bg-bg-1 px-2 py-1 text-[11px] text-fg-dim">
+            {digestIds.length} {digestIds.length === 1 ? "item" : "items"}
+          </span>
+        </div>
+
+        <div className="mt-3 space-y-2">
+          {pinnedItems.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center gap-2 rounded-[8px] border border-line bg-bg-1 px-3 py-2"
+            >
+              <span className="mono text-[11px] text-fg-faint">{item.id}</span>
+              <span className="text-sm text-fg-dim line-clamp-2">{item.title}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onGenerateDigest}
+            disabled={digestIds.length === 0 || isRegenerating}
+            className={`flex-1 rounded-md px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+              isGeneratePrimary
+                ? "bg-accent text-bg hover:brightness-110"
+                : "border border-line bg-bg-1 text-fg-dim hover:border-line-2 hover:text-fg"
+            }`}
+          >
+            {isRegenerating ? "Generating…" : "Generate digest"}
+          </button>
+          <span className="rounded-md border border-line bg-bg-1 px-2.5 py-2 text-[11px] text-fg-dim">
+            {digestIds.length} {digestIds.length === 1 ? "item" : "items"}
+          </span>
+        </div>
+      </section>
+
+      {!summary ? (
+        <div className="rounded-[8px] border border-dashed border-line bg-bg-1 px-3 py-2 text-[11px] text-fg-faint">
+          Generate the digest to produce an executive summary, client digest, and provenance.
+        </div>
+      ) : null}
+
       <section className="rounded-[8px] border border-line bg-bg-2 p-4">
         <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.12em] text-fg-faint">
           <span className="h-1.5 w-1.5 rounded-full bg-ok shadow-[0_0_8px_var(--ok)]" />
@@ -157,54 +235,76 @@ function SummaryMode({
         </div>
       </section>
 
-      <section className="rounded-[8px] border border-line bg-bg-2 p-4">
-        <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
-          Executive summary
-        </div>
-        <div className="mt-3 space-y-3 text-sm leading-6 text-fg-dim">
-          {paragraphs.map((paragraph) => (
-            <p
-              key={paragraph}
-              dangerouslySetInnerHTML={{
-                __html: paragraph
-                  .replaceAll("class='em'", "class='text-fg font-medium'")
-                  .replaceAll('class="em"', 'class="text-fg font-medium"')
-                  .replaceAll("class='em-warn'", "class='text-warn font-medium'")
-                  .replaceAll('class="em-warn"', 'class="text-warn font-medium"')
-                  .replaceAll("class='em-risk'", "class='text-danger font-medium'")
-                  .replaceAll('class="em-risk"', 'class="text-danger font-medium"'),
-              }}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-[8px] border border-line bg-bg-2 p-4">
-        <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
-          Client digest
-        </div>
-        <div className="mt-3 space-y-3 text-sm text-fg-dim">
-          {[
-            { label: "Next from client", value: digestValue(digest?.nextFromClient) },
-            { label: "Next from us", value: digestValue(digest?.nextFromUs) },
-            { label: "Flags", value: digestValue(digest?.flags) },
-          ].map((row) => (
-            <div key={row.label} className="flex gap-3 rounded-[8px] border border-line bg-bg-1 p-3">
-              <div className="text-accent">→</div>
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
-                  {row.label}
-                </div>
-                <div className="mt-1 leading-6 text-fg-dim">{row.value}</div>
-              </div>
+      {summary ? (
+        <>
+          <section className="rounded-[8px] border border-line bg-bg-2 p-4">
+            <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+              Executive summary
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="mt-3 space-y-3 text-sm leading-6 text-fg-dim">
+              {paragraphs.map((paragraph) => (
+                <p
+                  key={paragraph}
+                  dangerouslySetInnerHTML={{
+                    __html: paragraph
+                      .replaceAll("class='em'", "class='text-fg font-medium'")
+                      .replaceAll('class=\"em\"', 'class=\"text-fg font-medium\"')
+                      .replaceAll(
+                        "class='em-warn'",
+                        "class='text-warn font-medium'",
+                      )
+                      .replaceAll(
+                        'class=\"em-warn\"',
+                        'class=\"text-warn font-medium\"',
+                      )
+                      .replaceAll(
+                        "class='em-risk'",
+                        "class='text-danger font-medium'",
+                      )
+                      .replaceAll(
+                        'class=\"em-risk\"',
+                        'class=\"text-danger font-medium\"',
+                      ),
+                  }}
+                />
+              ))}
+            </div>
+          </section>
 
-      <div className="rounded-[8px] border border-dashed border-line bg-bg-1 px-3 py-2 text-[11px] text-fg-faint">
-        {summary?.provenance ?? "Provenance will appear here after summary generation."}
-      </div>
+          <section className="rounded-[8px] border border-line bg-bg-2 p-4">
+            <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+              Client digest
+            </div>
+            <div className="mt-3 space-y-3 text-sm text-fg-dim">
+              {[
+                {
+                  label: "Next from client",
+                  value: digestValue(digest?.nextFromClient),
+                },
+                { label: "Next from us", value: digestValue(digest?.nextFromUs) },
+                { label: "Flags", value: digestValue(digest?.flags) },
+              ].map((row) => (
+                <div
+                  key={row.label}
+                  className="flex gap-3 rounded-[8px] border border-line bg-bg-1 p-3"
+                >
+                  <div className="text-accent">→</div>
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+                      {row.label}
+                    </div>
+                    <div className="mt-1 leading-6 text-fg-dim">{row.value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <div className="rounded-[8px] border border-dashed border-line bg-bg-1 px-3 py-2 text-[11px] text-fg-faint">
+            {summary.provenance}
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
@@ -212,9 +312,13 @@ function SummaryMode({
 function DetailMode({
   item,
   onBack,
+  inDigest,
+  onAddToDigest,
 }: {
   item: ConsultItem;
   onBack: () => void;
+  inDigest: boolean;
+  onAddToDigest: (id: string) => void;
 }) {
   const meta = kindMeta[item.kind];
   const ownerGradient = ownerGradients[item.owner] ?? ownerGradients.MK;
@@ -301,9 +405,17 @@ function DetailMode({
       <div className="mt-4 flex gap-2">
         <button
           type="button"
-          className="flex-1 rounded-md bg-accent px-3 py-2 text-sm font-semibold text-bg transition hover:brightness-110"
+          onClick={() => {
+            onAddToDigest(item.id);
+            onBack();
+          }}
+          className={`flex-1 rounded-md px-3 py-2 text-sm font-semibold transition ${
+            inDigest
+              ? "border border-line bg-bg-1 text-fg-dim hover:border-line-2 hover:text-fg"
+              : "bg-accent text-bg hover:brightness-110"
+          }`}
         >
-          Add to digest
+          {inDigest ? "In digest ✓" : "Add to digest"}
         </button>
         <button
           type="button"
@@ -320,9 +432,11 @@ function DetailMode({
 export default function RightPanel({
   items,
   summary,
+  digestIds,
   selectedItem,
   onBack,
-  onRegenerate,
+  onAddToDigest,
+  onGenerateDigest,
   isRegenerating = false,
 }: RightPanelProps) {
   const [copied, setCopied] = useState(false);
@@ -402,25 +516,6 @@ export default function RightPanel({
               >
                 {shared ? "Shared digest" : "Share digest"}
               </button>
-              <button
-                type="button"
-                onClick={onRegenerate}
-                disabled={!onRegenerate || isRegenerating || items.length === 0}
-                className="grid h-7 w-7 place-items-center rounded-md border border-line bg-bg-1 transition hover:border-line-2 hover:text-fg disabled:cursor-not-allowed disabled:opacity-50"
-                title={isRegenerating ? "Regenerating" : "Regenerate"}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
-                >
-                  <path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5" />
-                </svg>
-              </button>
             </>
           ) : null}
         </span>
@@ -428,9 +523,20 @@ export default function RightPanel({
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {selectedItem ? (
-          <DetailMode item={selectedItem} onBack={onBack} />
+          <DetailMode
+            item={selectedItem}
+            onBack={onBack}
+            inDigest={digestIds.includes(selectedItem.id)}
+            onAddToDigest={onAddToDigest}
+          />
         ) : (
-          <SummaryMode items={items} summary={summary} />
+          <SummaryMode
+            items={items}
+            summary={summary}
+            digestIds={digestIds}
+            onGenerateDigest={onGenerateDigest}
+            isRegenerating={isRegenerating}
+          />
         )}
       </div>
     </aside>

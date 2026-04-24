@@ -114,7 +114,13 @@ export default function InputPanel({
     () => buildHighlightSegments(value, highlights),
     [highlights, value],
   );
-  const showHighlights = activeTab === "Transcript" && highlightSegments.length > 0;
+  const visibleMetadata = activeTab === "Transcript" ? metadata : [];
+  const hasHighlightMatches = useMemo(
+    () => highlightSegments.some((segment) => segment.type === "highlight"),
+    [highlightSegments],
+  );
+  const showHighlights =
+    activeTab === "Transcript" && highlights.length > 0 && hasHighlightMatches;
   const highlightClasses: Record<InputHighlight["kind"], string> = {
     task: "bg-accent-weak text-fg",
     blocker: "bg-[var(--warn-weak)] text-warn",
@@ -127,15 +133,9 @@ export default function InputPanel({
       <div className="border-b border-line px-5 pt-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint">
-              Source
-            </div>
             <h2 className="mt-1 text-base font-semibold text-fg">
-              Client source material
+              Source
             </h2>
-          </div>
-          <div className="mono rounded-full border border-line bg-bg-2 px-2.5 py-1 text-[11px] text-fg-dim">
-            raw input
           </div>
         </div>
 
@@ -161,23 +161,34 @@ export default function InputPanel({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 border-b border-line px-5 py-3">
-        {metadata.map((item) => (
-          <div
-            key={item.label}
-            className="rounded-full border border-line bg-bg-2 px-3 py-1.5 text-xs text-fg-dim"
-          >
-            <span className="text-fg-faint">{item.label}</span>
-            <span className="ml-2 text-fg">{item.value}</span>
-          </div>
-        ))}
-      </div>
+      {visibleMetadata.length > 0 ? (
+        <div className="flex flex-wrap gap-2 border-b border-line px-5 py-3">
+          {visibleMetadata.map((item) => (
+            <div
+              key={item.label}
+              className="rounded-full border border-line bg-bg-2 px-3 py-1.5 text-xs text-fg-dim"
+            >
+              <span className="text-fg-faint">{item.label}</span>
+              <span className="ml-2 text-fg">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       <div className="min-h-0 flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(20,23,29,0.65),rgba(11,12,15,0.3))] px-5 py-4">
+        <textarea
+          value={value}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          rows={18}
+          spellCheck={false}
+          className="min-h-full w-full resize-none border-0 bg-transparent p-0 text-sm leading-7 text-fg outline-none placeholder:text-fg-faint"
+          placeholder="Paste a client transcript, email thread, or rough meeting notes here."
+        />
         {showHighlights ? (
-          <div className="space-y-3">
+          <div className="mt-4 space-y-3 border-t border-line pt-4">
             <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
-              Transcript with extracted source highlights
+              Extracted source highlights
             </div>
             <div className="whitespace-pre-wrap text-sm leading-7 text-fg">
               {highlightSegments.map((segment, index) =>
@@ -196,27 +207,10 @@ export default function InputPanel({
               )}
             </div>
           </div>
-        ) : (
-          <textarea
-            value={value}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            rows={18}
-            spellCheck={false}
-            className="min-h-full w-full resize-none border-0 bg-transparent p-0 text-sm leading-7 text-fg outline-none placeholder:text-fg-faint"
-            placeholder="Paste a client transcript, email thread, or rough meeting notes here."
-          />
-        )}
+        ) : null}
       </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-line bg-bg-1 px-5 py-3">
-        <div className="flex items-center gap-3 text-xs text-fg-dim">
-          <span className="mono rounded-md border border-line bg-bg-2 px-2 py-1 text-[11px] text-fg-faint">
-            CMD + ENTER
-          </span>
-          <span>Re-parse source into structured consulting work.</span>
-        </div>
-
+      <div className="flex items-center justify-end gap-3 border-t border-line bg-bg-1 px-5 py-3">
         <div className="flex items-center gap-2">
           <button
             type="button"

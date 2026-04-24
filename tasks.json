@@ -1,6 +1,6 @@
 {
   "project": "ConsultFlow - AI Consulting Workflow Engine",
-  "last_updated": "2026-04-24T14:58:00+0800",
+  "last_updated": "2026-04-24T15:45:00+0800",
   "tasks": [
     {
       "id": "TASK-000",
@@ -294,6 +294,45 @@
       "output": "Added MOCK_AI guards to the extract, summarize, and email API routes so local development can short-circuit to the existing mock payloads, and enabled MOCK_AI=true in web/.env.local.",
       "files": ["web/app/api/extract/route.ts", "web/app/api/summarize/route.ts", "web/app/api/email/route.ts", "web/.env.local"],
       "updated_at": "2026-04-24T14:58:00+0800"
+    }
+  ,
+    {
+      "id": "TASK-027",
+      "title": "Auto-parse on tab switch with per-tab sample content",
+      "description": "Two changes to web/app/page.tsx:\n\n1. Populate initial content for all three tabs in initialSourceText:\n\n   Email tab sample:\n   'From: Sarah Chen <s.chen@acmecorp.com>\n   To: Consulting team\n   Subject: RE: Commercial strategy workstream — quick update\n\n   Hi team, following up on our call. A few things:\n\n   Legal has flagged the vendor contract renewal — we need sign-off from procurement before we can proceed. Targeting end of next week but this is at risk.\n\n   Can someone own the competitive benchmarking deck? We promised the board a first draft by May 2.\n\n   Also waiting on Marcus to confirm the go-live date for the APAC rollout. He was supposed to revert by yesterday.'\n\n   Notes tab sample:\n   'Whiteboard session — Apr 23\n\n   Three priority areas agreed:\n   - Pricing model needs rework before board presentation (owner: TBD, due May 5)\n   - NPS data from Q2 still missing — blocked on analytics team access\n   - Draft exec summary for CFO review by Apr 28 — JS taking point\n\n   Open question: do we expand scope to include LATAM? Client leaning yes but no budget confirmed.'\n\n2. Auto-parse on tab switch: in handleTabChange, after setting activeTab, check if the new tab has content (sourceText[tab].trim().length > 0). If yes, call handleParse immediately (using the new tab's content). This means switching tabs with content automatically triggers extraction and updates the board.\n\nIMPORTANT: handleTabChange must read the new tab's source text — not the stale activeTab value. Pass the new tab value directly to the fetch body rather than relying on the activeTab state which won't have updated yet. Extract a shared parseFn(tab: SourceTab) helper that takes a tab argument instead of reading activeTab from closure.",
+      "stage": "ingest",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-012"],
+      "output": "Populated the Email and Notes tabs with sample source content, refactored parsing into a tab-aware helper, and made tab switches auto-trigger extraction using the newly selected tab's text instead of stale active state.",
+      "files": ["web/app/page.tsx"],
+      "updated_at": "2026-04-24T10:45:39+0800"
+    }
+  ,
+    {
+      "id": "TASK-028",
+      "title": "Make sidebar retractable",
+      "description": "Add collapse/expand behaviour to the sidebar.\n\n1. In page.tsx: add sidebarOpen: boolean state (default true). Pass it and a toggle handler to Sidebar as props. Change the grid-cols from fixed `[232px_1fr]` to `[var(--sidebar-w)_1fr]` where --sidebar-w is set inline as a CSSProperty: 232px when open, 48px when collapsed.\n\n2. In Sidebar.tsx:\n   - Accept props: { collapsed: boolean; onToggle: () => void }\n   - When collapsed (48px wide): hide all text labels, section headings, and engagement names. Show only icon columns — brand mark, nav icons, engagement color pips, user avatar. Center everything.\n   - Add a toggle button at the top of the sidebar (chevron icon, rotates 180° when collapsed). Position it at the top-right edge.\n   - Use `transition-all duration-200` on the sidebar root so the width animates smoothly.\n   - When collapsed, show a tooltip (title attribute) on each nav icon so users still know what each item is.\n\n3. The toggle button can use a simple ‹ / › or chevron SVG inline — no icon library needed.",
+      "stage": "ingest",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-020", "TASK-019"],
+      "output": "Implemented a retractable sidebar driven by the page-level --sidebar-w CSS variable, added a top-right chevron toggle, and switched Sidebar to an icon-only layout with tooltips when collapsed. Verified the Next.js build succeeds.",
+      "files": ["web/app/page.tsx", "web/components/Sidebar.tsx"],
+      "updated_at": "2026-04-24T16:05:00+0800"
+    }
+  ,
+    {
+      "id": "TASK-029",
+      "title": "Implement digest list and manual Generate digest flow",
+      "description": "Replace the auto-summarize-on-parse flow with a manual curator-driven digest.\n\n## State changes (page.tsx)\n- Add `digestIds: string[]` state (default `[]`) — ordered list of item IDs the user has pinned to the digest.\n- Remove the automatic `generateSummary(payload.items)` call that fires after extraction. Summary starts null until the user triggers it.\n- Add `handleAddToDigest(id: string)`: toggles the id in digestIds (add if absent, remove if present).\n- Add `handleGenerateDigest()`: calls POST /api/summarize with `{ items: digestIds.map(id => items.find(...)) }` — only the pinned items, not the full list. Sets summary state on success.\n\n## RightPanel changes\n- Summary mode (selectedItem=null):\n  - When digestIds is empty: show an empty state — 'No items in digest yet. Open a card and click Add to digest to get started.'\n  - Show a 'Generate digest' primary button below the digest list. Disabled when digestIds is empty or isRegenerating. Active (accent colored) when digestIds.length > 0 and summary is null.\n  - Show pinned item count pill next to the Generate button: e.g. '3 items'.\n  - After summary is generated, show exec summary + client digest as before. Keep the Generate button visible so user can regenerate after adding/removing items.\n- Detail mode (selectedItem set):\n  - 'Add to digest' button: accent-colored when item is NOT in digestIds, muted/outlined when it IS (acts as toggle). Label switches: 'Add to digest' → 'In digest ✓'.\n\n## Props changes\n- RightPanel: add `digestIds: string[]`, `onAddToDigest: (id: string) => void`, `onGenerateDigest: () => void`.\n- Remove `onRegenerate` prop (replaced by `onGenerateDigest`).",
+      "stage": "execute",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-011", "TASK-012", "TASK-006"],
+      "output": "Replaced auto-summarize with a curator-driven digest: users can pin items from detail view, see a digest list in the RightPanel, and manually generate/regenerate a digest summary using only pinned items. Summary now stays null until generated.",
+      "files": ["web/app/page.tsx", "web/components/RightPanel.tsx"],
+      "updated_at": "2026-04-24T16:18:00+0800"
     }
   ]
 }

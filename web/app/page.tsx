@@ -30,8 +30,25 @@ There is a risk that legal review slips if procurement redlines are not resolved
 
 const initialSourceText: Record<SourceTab, string> = {
   Transcript: initialTranscript,
-  Email: "",
-  Notes: "",
+  Email: `From: Sarah Chen <s.chen@acmecorp.com>
+To: Consulting team
+Subject: RE: Commercial strategy workstream — quick update
+
+Hi team, following up on our call. A few things:
+
+Legal has flagged the vendor contract renewal — we need sign-off from procurement before we can proceed. Targeting end of next week but this is at risk.
+
+Can someone own the competitive benchmarking deck? We promised the board a first draft by May 2.
+
+Also waiting on Marcus to confirm the go-live date for the APAC rollout. He was supposed to revert by yesterday.`,
+  Notes: `Whiteboard session — Apr 23
+
+Three priority areas agreed:
+- Pricing model needs rework before board presentation (owner: TBD, due May 5)
+- NPS data from Q2 still missing — blocked on analytics team access
+- Draft exec summary for CFO review by Apr 28 — JS taking point
+
+Open question: do we expand scope to include LATAM? Client leaning yes but no budget confirmed.`,
 };
 
 const emptyStats: Stats = {
@@ -41,7 +58,8 @@ const emptyStats: Stats = {
   risks: 0,
 };
 
-const loadingStepDurations = [375, 375, 375];
+const loadingStepDurations = [600, 600, 600];
+const minimumParseOverlayMs = 2600;
 const viewTabs = ["Board", "List", "Timeline"] as const;
 const accentThemes = {
   blue: {
@@ -68,12 +86,14 @@ function delay(ms: number) {
 }
 
 export default function Home() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sourceText, setSourceText] =
     useState<Record<SourceTab, string>>(initialSourceText);
   const [activeTab, setActiveTab] = useState<SourceTab>("Transcript");
   const [items, setItems] = useState<ConsultItem[]>([]);
   const [stats, setStats] = useState<Stats>(emptyStats);
   const [summary, setSummary] = useState<SummaryData | null>(null);
+  const [digestIds, setDigestIds] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -113,6 +133,14 @@ export default function Home() {
     [accentTheme],
   );
 
+  const shellStyle = useMemo<CSSProperties>(
+    () =>
+      ({
+        "--sidebar-w": sidebarOpen ? "232px" : "48px",
+      }) as CSSProperties,
+    [sidebarOpen],
+  );
+
   const updateSourceText = useCallback(
     (value: string) => {
       setSourceText((current) => ({
@@ -122,11 +150,6 @@ export default function Home() {
     },
     [activeTab],
   );
-
-  const handleTabChange = useCallback((tab: SourceTab) => {
-    setActiveTab(tab);
-    setErrorMessage(null);
-  }, []);
 
   const handleBoardSelect = useCallback((id: string) => {
     setSelectedId(id);
@@ -167,15 +190,35 @@ export default function Home() {
     setSummary(payload);
   }, []);
 
-  const handleRegenerateSummary = useCallback(async () => {
-    if (items.length === 0 || isRegenerating || isParsing) {
+  const handleAddToDigest = useCallback((id: string) => {
+    setDigestIds((current) => {
+      const exists = current.includes(id);
+      return exists ? current.filter((value) => value !== id) : [...current, id];
+    });
+    setSummary(null);
+    setSummaryError(null);
+  }, []);
+
+  const handleGenerateDigest = useCallback(async () => {
+    if (isRegenerating || isParsing) {
+      return;
+    }
+
+    const pinnedItems = digestIds
+      .map((id) => items.find((item) => item.id === id))
+      .filter((item): item is ConsultItem => Boolean(item));
+
+    if (pinnedItems.length === 0) {
+      setSummary(null);
+      setSummaryError(null);
       return;
     }
 
     setIsRegenerating(true);
+    setSummaryError(null);
 
     try {
-      await generateSummary(items);
+      await generateSummary(pinnedItems);
     } catch (error) {
       setSummaryError(
         error instanceof Error ? error.message : "Unexpected summarization error.",
@@ -183,76 +226,89 @@ export default function Home() {
     } finally {
       setIsRegenerating(false);
     }
-  }, [generateSummary, isParsing, isRegenerating, items]);
+  }, [digestIds, generateSummary, isParsing, isRegenerating, items]);
 
-  const handleParse = useCallback(async () => {
-    const input = sourceText[activeTab].trim();
+  const parseSourceTab = useCallback(
+    async (tab: SourceTab) => {
+      const input = sourceText[tab].trim();
 
-    if (!input || isParsing) {
-      return;
-    }
-
-    setIsParsing(true);
-    setCurrentStep(0);
-    setErrorMessage(null);
-    setSummaryError(null);
-    setSelectedId(null);
-    setSummary(null);
-
-    const stepTimers = loadingStepDurations.map((duration, index) =>
-      window.setTimeout(() => {
-        setCurrentStep(index + 1);
-      }, loadingStepDurations.slice(0, index + 1).reduce((sum, value) => sum + value, 0)),
-    );
-
-    try {
-      const [response] = await Promise.all([
-        fetch("/api/extract", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ input }),
-        }),
-        delay(1500),
-      ]);
-
-      const payload = (await response.json()) as ExtractResponse & { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Failed to extract structured items.");
+      if (!input || isParsing) {
+        return;
       }
 
-      setItems(payload.items);
-      setStats(payload.stats);
+      setIsParsing(true);
+      setCurrentStep(0);
+      setErrorMessage(null);
+      setSummaryError(null);
+      setSelectedId(null);
+      setSummary(null);
+      setDigestIds([]);
+
+      const stepTimers = loadingStepDurations.map((duration, index) =>
+        window.setTimeout(() => {
+          setCurrentStep(index + 1);
+        }, loadingStepDurations.slice(0, index + 1).reduce((sum, value) => sum + value, 0)),
+      );
 
       try {
-        await generateSummary(payload.items);
+        const [response] = await Promise.all([
+          fetch("/api/extract", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ input }),
+          }),
+          delay(minimumParseOverlayMs),
+        ]);
+
+        const payload = (await response.json()) as ExtractResponse & { error?: string };
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "Failed to extract structured items.");
+        }
+
+        setItems(payload.items);
+        setStats(payload.stats);
       } catch (error) {
-        setSummaryError(
-          error instanceof Error ? error.message : "Unexpected summarization error.",
+        setItems([]);
+        setStats(emptyStats);
+        setDigestIds([]);
+        setErrorMessage(
+          error instanceof Error ? error.message : "Unexpected extraction error.",
         );
+      } finally {
+        stepTimers.forEach((timer) => window.clearTimeout(timer));
+        setIsParsing(false);
+        setCurrentStep(0);
       }
-    } catch (error) {
-      setItems([]);
-      setStats(emptyStats);
-      setErrorMessage(
-        error instanceof Error ? error.message : "Unexpected extraction error.",
-      );
-    } finally {
-      stepTimers.forEach((timer) => window.clearTimeout(timer));
-      setIsParsing(false);
-      setCurrentStep(0);
-    }
-  }, [activeTab, generateSummary, isParsing, sourceText]);
+    },
+    [generateSummary, isParsing, sourceText],
+  );
+
+  const handleTabChange = useCallback((tab: SourceTab) => {
+    setActiveTab(tab);
+    setErrorMessage(null);
+  }, []);
+
+  const handleParse = useCallback(async () => {
+    await parseSourceTab(activeTab);
+  }, [activeTab, parseSourceTab]);
 
   return (
     <main
       className="relative h-screen overflow-hidden bg-bg p-3 text-fg"
       style={themeStyle}
     >
-      <div className="grid h-full grid-cols-[232px_1fr] overflow-hidden rounded-shell border border-line bg-bg">
-        <Sidebar items={items} />
+      <div
+        className="grid h-full grid-cols-[var(--sidebar-w)_1fr] overflow-hidden rounded-shell border border-line bg-bg"
+        style={shellStyle}
+      >
+        <Sidebar
+          items={items}
+          collapsed={!sidebarOpen}
+          onToggle={() => setSidebarOpen((current) => !current)}
+        />
 
         <section className="grid min-h-0 min-w-0 grid-rows-[44px_1fr]">
           <div className="flex items-center gap-3 border-b border-line px-4">
@@ -325,7 +381,9 @@ export default function Home() {
                 summary={summary}
                 selectedItem={selectedItem}
                 onBack={handleBack}
-                onRegenerate={handleRegenerateSummary}
+                digestIds={digestIds}
+                onAddToDigest={handleAddToDigest}
+                onGenerateDigest={handleGenerateDigest}
                 isRegenerating={isRegenerating}
               />
               {summaryError ? (
