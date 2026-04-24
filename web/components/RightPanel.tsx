@@ -315,7 +315,8 @@ onConfirmSendEmail,
             <div className="text-base font-semibold text-fg">Preview email</div>
             <div className="mt-3 space-y-2 text-sm">
               <div className="text-fg-mute">To: Sarah Chen &lt;s.chen@acmecorp.com&gt;</div>
-              <div className="text-fg-mute">Subject: Acme Corp — Apr 24 Update</div>
+              <div className="text-fg-mute">Cc: Consulting Team &lt;team@firm.com&gt;</div>
+              <div className="text-fg font-medium">Subject: Acme Corp — Weekly Status Update</div>
             </div>
             <div className="mt-4 rounded-md border border-line bg-bg-1 p-3">
               <pre className="whitespace-pre-wrap text-[12px] leading-relaxed text-fg font-sans">

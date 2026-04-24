@@ -558,7 +558,7 @@ export default function Home() {
                     isSendingEmail={isSendingEmail}
                     emailSent={!!emailResult}
                     showEmailPreview={showEmailPreview}
-                    emailPreviewContent={summary?.execSummary.replace(/<[^>]+>/g, "")}
+                    emailPreviewContent={summary ? `Hi Team,\n\n${summary.execSummary.replace(/<[^>]+>/g, "")}\n\nNext from us: ${summary.clientDigest.nextFromUs}\n\nFlags: ${summary.clientDigest.flags}\n\nBest regards,\nConsulting Team` : undefined}
                     actionResults={actionResults}
                     runningAction={runningAction}
                     onRunAction={handleRunAction}
