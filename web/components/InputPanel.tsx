@@ -1,8 +1,13 @@
 "use client";
 
-import { ChangeEvent } from "react";
+import { ChangeEvent, KeyboardEvent, useMemo } from "react";
 
 export type SourceTab = "Transcript" | "Email" | "Notes";
+export type InputHighlight = {
+  id: string;
+  kind: "task" | "blocker" | "risk" | "waiting";
+  quote: string;
+};
 
 export type InputPanelProps = {
   value: string;
@@ -12,6 +17,8 @@ export type InputPanelProps = {
   activeTab: SourceTab;
   onTabChange: (tab: SourceTab) => void;
   attn?: boolean;
+  highlights?: InputHighlight[];
+  onHighlightSelect?: (id: string) => void;
 };
 
 const tabs: SourceTab[] = ["Transcript", "Email", "Notes"];
@@ -23,6 +30,63 @@ const metadata = [
   { label: "Words", value: "1.6k" },
 ];
 
+function buildHighlightSegments(value: string, highlights: InputHighlight[]) {
+  const ranges = highlights
+    .map((highlight) => {
+      const normalizedQuote = highlight.quote.trim();
+
+      if (!normalizedQuote) {
+        return null;
+      }
+
+      const start = value.toLowerCase().indexOf(normalizedQuote.toLowerCase());
+
+      if (start === -1) {
+        return null;
+      }
+
+      return {
+        ...highlight,
+        start,
+        end: start + normalizedQuote.length,
+      };
+    })
+    .filter((range): range is InputHighlight & { start: number; end: number } => Boolean(range))
+    .sort((a, b) => a.start - b.start);
+
+  const nonOverlapping = ranges.filter((range, index) => {
+    const previous = ranges[index - 1];
+    return !previous || range.start >= previous.end;
+  });
+
+  const segments: Array<
+    | { type: "text"; text: string }
+    | { type: "highlight"; text: string; id: string; kind: InputHighlight["kind"] }
+  > = [];
+
+  let cursor = 0;
+
+  nonOverlapping.forEach((range) => {
+    if (range.start > cursor) {
+      segments.push({ type: "text", text: value.slice(cursor, range.start) });
+    }
+
+    segments.push({
+      type: "highlight",
+      text: value.slice(range.start, range.end),
+      id: range.id,
+      kind: range.kind,
+    });
+    cursor = range.end;
+  });
+
+  if (cursor < value.length) {
+    segments.push({ type: "text", text: value.slice(cursor) });
+  }
+
+  return segments;
+}
+
 export default function InputPanel({
   value,
   onChange,
@@ -31,12 +95,32 @@ export default function InputPanel({
   activeTab,
   onTabChange,
   attn = false,
+  highlights = [],
+  onHighlightSelect,
 }: InputPanelProps) {
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     onChange(event.target.value);
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter" && canParse) {
+      event.preventDefault();
+      onParse?.();
+    }
+  };
+
   const canParse = value.trim().length > 0 && !isParsing;
+  const highlightSegments = useMemo(
+    () => buildHighlightSegments(value, highlights),
+    [highlights, value],
+  );
+  const showHighlights = activeTab === "Transcript" && highlightSegments.length > 0;
+  const highlightClasses: Record<InputHighlight["kind"], string> = {
+    task: "bg-accent-weak text-fg",
+    blocker: "bg-[var(--warn-weak)] text-warn",
+    risk: "bg-[var(--danger-weak)] text-danger",
+    waiting: "bg-[var(--info-weak)] text-info",
+  };
 
   return (
     <section className="panel flex h-full min-h-0 flex-col overflow-hidden">
@@ -90,14 +174,39 @@ export default function InputPanel({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(20,23,29,0.65),rgba(11,12,15,0.3))] px-5 py-4">
-        <textarea
-          value={value}
-          onChange={handleChange}
-          rows={18}
-          spellCheck={false}
-          className="min-h-full w-full resize-none border-0 bg-transparent p-0 text-sm leading-7 text-fg outline-none placeholder:text-fg-faint"
-          placeholder="Paste a client transcript, email thread, or rough meeting notes here."
-        />
+        {showHighlights ? (
+          <div className="space-y-3">
+            <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+              Transcript with extracted source highlights
+            </div>
+            <div className="whitespace-pre-wrap text-sm leading-7 text-fg">
+              {highlightSegments.map((segment, index) =>
+                segment.type === "highlight" ? (
+                  <button
+                    key={`${segment.id}-${index}`}
+                    type="button"
+                    onClick={() => onHighlightSelect?.(segment.id)}
+                    className={`rounded px-1 py-0.5 text-left transition hover:brightness-110 ${highlightClasses[segment.kind]}`}
+                  >
+                    {segment.text}
+                  </button>
+                ) : (
+                  <span key={`text-${index}`}>{segment.text}</span>
+                ),
+              )}
+            </div>
+          </div>
+        ) : (
+          <textarea
+            value={value}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            rows={18}
+            spellCheck={false}
+            className="min-h-full w-full resize-none border-0 bg-transparent p-0 text-sm leading-7 text-fg outline-none placeholder:text-fg-faint"
+            placeholder="Paste a client transcript, email thread, or rough meeting notes here."
+          />
+        )}
       </div>
 
       <div className="flex items-center justify-between gap-3 border-t border-line bg-bg-1 px-5 py-3">

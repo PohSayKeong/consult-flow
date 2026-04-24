@@ -1,6 +1,6 @@
 {
   "project": "ConsultFlow - AI Consulting Workflow Engine",
-  "last_updated": "2026-04-24T12:00:00+0800",
+  "last_updated": "2026-04-24T13:19:00+0800",
   "tasks": [
     {
       "id": "TASK-000",
@@ -104,11 +104,11 @@
       "description": "Create web/components/Card.tsx. Card shows: card-top row (mono id + kind badge colored by type: k-task/k-blocker/k-risk/k-waiting + 'from client' badge if waiting), card-title, card-meta row (owner avatar circle with gradient by initials, due date with overdue/soon color, first tag). Apply waiting-highlight border + left accent bar when item.waiting=true. Apply selected ring when selected prop is true. cardIn animation on mount. Props: { item: ConsultItem; selected?: boolean; onClick: () => void }.",
       "stage": "plan",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-001", "TASK-017", "TASK-018"],
-      "output": "",
+      "output": "Added a reusable schema-typed Card component with kind badges, owner avatar gradients, due-state coloring, waiting-on-client highlighting, and selected-state ring styling for the upcoming board view.",
       "files": ["web/components/Card.tsx"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T12:18:00+0800"
     },
     {
       "id": "TASK-005",
@@ -116,11 +116,11 @@
       "description": "Create web/components/Board.tsx. Four columns: Todo, In progress, Waiting on client, Done. Each column has a col-head (colored swatch dot, label, count, + add icon) and scrollable col-body rendering Card components. Filter bar above columns with filter chips (All types, Any owner, This sprint) and Group label. During skeleton mode, render skel cards with shimmer animation. Props: { items: ConsultItem[]; selectedId: string|null; onSelect: (id:string)=>void; loading?: boolean }.",
       "stage": "plan",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-021", "TASK-001"],
-      "output": "",
+      "output": "Added the kanban Board component with filter chips, four status columns, skeleton loading cards, empty states, and Card-based rendering wired for item selection.",
       "files": ["web/components/Board.tsx"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T12:31:00+0800"
     },
     {
       "id": "TASK-022",
@@ -140,11 +140,11 @@
       "description": "Rebuild web/components/RightPanel.tsx to match mockup. Delete web/components/SummaryPanel.tsx (orphaned old component) at the same time. Two modes controlled by selectedItem prop: (1) Summary mode (selectedItem=null): panel-head 'Executive summary' + copy/regenerate icons, stat grid (Action items/Waiting/Blockers/Risks), progress bar (done/doing/waiting/todo segments), exec summary paragraphs, client digest items, provenance footer. (2) Detail mode (selectedItem set): panel-head showing item id, kind badges + status badge, detail-title, detail-grid (Owner/Due/Status/Type/Tags/Engagement), source quote block, 'Add to digest' + 'Back' buttons. Props: { items: ConsultItem[]; summary: SummaryData|null; selectedItem: ConsultItem|null; onBack: ()=>void }.",
       "stage": "communicate",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-001", "TASK-017", "TASK-018"],
-      "output": "",
+      "output": "Replaced the old summary panel with a new RightPanel supporting executive-summary and item-detail modes, derived stats/progress, digest/provenance sections, copy action, and detail metadata with source quote handling.",
       "files": ["web/components/RightPanel.tsx"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T12:31:00+0800"
     },
     {
       "id": "TASK-004",
@@ -164,11 +164,11 @@
       "description": "Create web/app/api/extract/route.ts. Use the Managed Agents pattern: (1) Read EXTRACTOR_AGENT_ID from process.env (set by TASK-023 setup script). (2) Create a session: anthropic.beta.agents.sessions.create({ agent_id: EXTRACTOR_AGENT_ID }). (3) Send the user's input text as a user message in the session. (4) Poll/stream until session completes and extract the assistant's text response. (5) JSON.parse the response into ConsultItem[]. (6) Compute stats { total, waiting, blockers, risks }. (7) Return { items, stats }. Handle missing agent ID (500) and JSON parse errors (422). Beta header required: 'managed-agents-2026-04-01'.",
       "stage": "plan",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-001", "TASK-023", "TASK-016"],
-      "output": "",
+      "output": "Added the extract API route backed by managed-agent sessions, including environment-aware session startup, streamed response collection, stats computation, and 422 handling for invalid JSON output.",
       "files": ["web/app/api/extract/route.ts"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T12:52:00+0800"
     },
     {
       "id": "TASK-007",
@@ -188,11 +188,11 @@
       "description": "Create web/app/api/summarize/route.ts. Use the Managed Agents pattern: (1) Read EXECUTION_AGENT_ID from process.env (set by TASK-023 setup script). (2) Create a session: anthropic.beta.agents.sessions.create({ agent_id: EXECUTION_AGENT_ID }). (3) Send JSON.stringify(items) as the user message. (4) Poll/stream until session completes and extract the assistant's response text. (5) JSON.parse into { execSummary, clientDigest, provenance }. (6) Return the parsed object. Handle missing agent ID (500) and JSON parse errors (422). Beta header required: 'managed-agents-2026-04-01'.",
       "stage": "execute",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-001", "TASK-023", "TASK-016"],
-      "output": "",
+      "output": "Added the summarize API route backed by managed-agent sessions, sharing streamed response handling and returning parsed summary JSON with structured route errors.",
       "files": ["web/app/api/summarize/route.ts"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T12:52:00+0800"
     },
     {
       "id": "TASK-012",
@@ -200,11 +200,11 @@
       "description": "Update web/app/page.tsx to wire up the full parse interaction: Re-parse/Parse button triggers POST /api/extract. Show LoadingOverlay with animated steps during request (simulate 4 steps over ~1.5s). On success, update items state and stats state. Render Sidebar, InputPanel, Board (with skeleton during load), RightPanel. Use useCallback and useState for items, stats, loading, selectedId, summary state.",
       "stage": "ingest",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-003", "TASK-005", "TASK-002", "TASK-020", "TASK-022", "TASK-019"],
-      "output": "",
+      "output": "Replaced the page placeholders with the real Board and RightPanel, wired parse requests to /api/extract with loading-overlay step animation, and now store extracted items, stats, and selection state in the app shell.",
       "files": ["web/app/page.tsx"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T13:06:00+0800"
     },
     {
       "id": "TASK-013",
@@ -212,11 +212,11 @@
       "description": "After extraction succeeds in page.tsx, automatically POST items to /api/summarize and store the result in summary state. Pass summary + stats to RightPanel so the Executive Summary view populates with real AI-generated content including exec summary paragraphs, client digest, and provenance. Add a Regenerate button (in RightPanel panel-head) that re-calls /api/summarize on demand.",
       "stage": "execute",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-006", "TASK-011", "TASK-012"],
-      "output": "",
+      "output": "After extraction, page.tsx now automatically requests /api/summarize, stores the returned executive summary/digest/provenance, and wires RightPanel regeneration for on-demand refresh.",
       "files": ["web/app/page.tsx"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T13:06:00+0800"
     },
     {
       "id": "TASK-014",
@@ -224,11 +224,11 @@
       "description": "In page.tsx, wire Board's onSelect callback to update selectedId state. Pass the selected ConsultItem to RightPanel. RightPanel switches to detail mode showing item metadata and source quote. 'Back' button clears selectedId, returning to summary view. Clicking a highlighted span in InputPanel's transcript text should also open the corresponding card detail.",
       "stage": "execute",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-013", "TASK-011", "TASK-005"],
-      "output": "",
+      "output": "Wired board card selection into page state and RightPanel detail mode, added Back-to-summary behavior, and made transcript quote highlights in InputPanel open the matching card detail directly.",
       "files": ["web/app/page.tsx"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T13:19:00+0800"
     },
     {
       "id": "TASK-015",
@@ -264,11 +264,11 @@
       "description": "Create web/scripts/setup-agents.ts. This script runs once to create the three persistent Managed Agent objects and prints their IDs for .env.local.\n\nSteps:\n1. Import Anthropic SDK with beta header 'managed-agents-2026-04-01'.\n2. Read each system prompt file from web/prompts/agent-extractor.txt, agent-execution.txt, agent-email.txt using fs.readFileSync.\n3. Call anthropic.beta.agents.create() for each:\n   - Extractor: { name: 'ConsultFlow Extractor', model: 'claude-haiku-4-5', system: <extractor prompt> }\n   - Execution: { name: 'ConsultFlow Execution', model: 'claude-haiku-4-5', system: <execution prompt> }\n   - Email: { name: 'ConsultFlow Email', model: 'claude-haiku-4-5', system: <email prompt> }\n4. Print the three agent IDs to stdout in .env format:\n   EXTRACTOR_AGENT_ID=<id>\n   EXECUTION_AGENT_ID=<id>\n   EMAIL_AGENT_ID=<id>\n5. Append these to web/.env.local automatically.\n\nAdd a package.json script: 'setup-agents': 'npx tsx scripts/setup-agents.ts'\n\nIMPORTANT: agents.create() is called only once. Subsequent calls create new agents (waste money). The script should check if IDs already exist in .env.local and skip re-creation.",
       "stage": "plan",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-023", "TASK-016"],
-      "output": "",
+      "output": "Created a setup-agents script that provisions a managed environment plus extractor/execution/email agents only when missing, writes their IDs into .env.local, and added a package.json script for rerunning setup safely.",
       "files": ["web/scripts/setup-agents.ts", "web/package.json", "web/.env.local"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T12:52:00+0800"
     },
     {
       "id": "TASK-025",
@@ -276,11 +276,11 @@
       "description": "Create web/app/api/email/route.ts. Use the Managed Agents pattern:\n1. Read EMAIL_AGENT_ID from process.env.\n2. Create a session: anthropic.beta.agents.sessions.create({ agent_id: EMAIL_AGENT_ID }).\n3. Send JSON.stringify({ items, summary }) as the user message, where items: ConsultItem[] and summary: SummaryData come from the request body.\n4. Poll/stream until session completes and extract the assistant response text.\n5. JSON.parse into { subject: string, body: string, tone: string }.\n6. Return the parsed object.\nHandle missing agent ID (500) and JSON parse errors (422).\nBeta header required: 'managed-agents-2026-04-01'.",
       "stage": "communicate",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-023", "TASK-024", "TASK-016"],
-      "output": "",
+      "output": "Added the email API route backed by the managed email agent, validating items/summary input, streaming the agent response, and returning parsed subject/body/tone JSON with route-level error handling.",
       "files": ["web/app/api/email/route.ts"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T13:06:00+0800"
     }
   ]
 }
