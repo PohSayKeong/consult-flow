@@ -2,3 +2,6 @@
 web/tsconfig.tsbuildinfo
 /.gsk
 .opencode.json
+ConsultFlow-demo.mp4
+consult-flow-video/out/
+consult-flow-video/build/
