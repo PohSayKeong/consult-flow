@@ -1,6 +1,6 @@
 {
   "project": "ConsultFlow - AI Consulting Workflow Engine",
-  "last_updated": "2026-04-24T10:12:09+0800",
+  "last_updated": "2026-04-24T12:00:00+0800",
   "tasks": [
     {
       "id": "TASK-000",
@@ -32,11 +32,11 @@
       "description": "Create web/types/schema.ts with the ConsultItem TypeScript interface matching the mockup data model: { id: string; title: string; kind: 'task'|'blocker'|'risk'|'waiting'; status: 'todo'|'doing'|'waiting'|'done'; owner: string; ownerName: string; due: string; dueFlag: 'soon'|'overdue'|null; tags: string[]; waiting: boolean; quote: string|null; suggested_action?: string; suggested_owner?: string }. Also export a Stats interface: { total, waiting, blockers, risks }.",
       "stage": "plan",
       "owner": "claude",
-      "status": "todo",
+      "status": "done",
       "dependencies": [],
-      "output": "",
+      "output": "Created web/types/schema.ts exporting ConsultItem, ItemKind, ItemStatus, DueFlag, Stats, ClientDigest, SummaryData, ExtractResponse, and SummarizeResponse interfaces.",
       "files": ["web/types/schema.ts"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T10:35:00+0800"
     },
     {
       "id": "TASK-017",
@@ -128,16 +128,16 @@
       "description": "Create web/components/LoadingOverlay.tsx. Fullscreen backdrop (blur + semi-transparent). Centered loading-card with title + spinner. Four loading-step rows: 'Segmenting by speaker', 'Identifying commitments & owners', 'Classifying blockers, risks, waiting-on-client', 'Linking to source quotes'. Steps animate through: completed steps show ✓ in ok color, current step shows mini spinner, future steps are dimmed. Props: { visible: boolean; currentStep: number }.",
       "stage": "plan",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-017"],
-      "output": "",
+      "output": "Added a fullscreen loading overlay component with blurred backdrop, animated spinner card, and four staged extraction steps that visually distinguish completed, active, and upcoming work.",
       "files": ["web/components/LoadingOverlay.tsx"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T10:35:00+0800"
     },
     {
       "id": "TASK-011",
       "title": "Build RightPanel component",
-      "description": "Rebuild web/components/RightPanel.tsx to match mockup. Two modes controlled by selectedItem prop: (1) Summary mode (selectedItem=null): panel-head 'Executive summary' + copy/regenerate icons, stat grid (Action items/Waiting/Blockers/Risks), progress bar (done/doing/waiting/todo segments), exec summary paragraphs, client digest items, provenance footer. (2) Detail mode (selectedItem set): panel-head showing item id, kind badges + status badge, detail-title, detail-grid (Owner/Due/Status/Type/Tags/Engagement), source quote block, 'Add to digest' + 'Back' buttons. Props: { items: ConsultItem[]; summary: SummaryData|null; selectedItem: ConsultItem|null; onBack: ()=>void }. Previous light-theme component must be replaced entirely.",
+      "description": "Rebuild web/components/RightPanel.tsx to match mockup. Delete web/components/SummaryPanel.tsx (orphaned old component) at the same time. Two modes controlled by selectedItem prop: (1) Summary mode (selectedItem=null): panel-head 'Executive summary' + copy/regenerate icons, stat grid (Action items/Waiting/Blockers/Risks), progress bar (done/doing/waiting/todo segments), exec summary paragraphs, client digest items, provenance footer. (2) Detail mode (selectedItem set): panel-head showing item id, kind badges + status badge, detail-title, detail-grid (Owner/Due/Status/Type/Tags/Engagement), source quote block, 'Add to digest' + 'Back' buttons. Props: { items: ConsultItem[]; summary: SummaryData|null; selectedItem: ConsultItem|null; onBack: ()=>void }.",
       "stage": "communicate",
       "owner": "codex",
       "status": "todo",
@@ -152,20 +152,20 @@
       "description": "Write web/prompts/extract.txt. System prompt instructing the LLM to extract all action items, blockers, risks, and client-waiting items from raw transcript/email/notes text. For each item output JSON matching ConsultItem schema: id (sequential e.g. ACM-101), title, kind (task|blocker|risk|waiting), status (todo|doing|waiting|done — use 'waiting' for items blocked on client), owner (2-3 letter initials), ownerName (full name + '(client)' if external), due (natural language), dueFlag (soon|overdue|null), tags (2-3 lowercase topic tags), waiting (true if client must act), quote (verbatim excerpt from source, max 30 words). Return only a JSON array.",
       "stage": "plan",
       "owner": "claude",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-001"],
-      "output": "",
+      "output": "Written at web/prompts/extract.txt. Includes field-by-field schema instructions, kind/status classification rules, quote extraction guidance, and a complete example output object.",
       "files": ["web/prompts/extract.txt"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T10:35:00+0800"
     },
     {
       "id": "TASK-003",
-      "title": "Implement POST /api/extract",
-      "description": "Create web/app/api/extract/route.ts. Accept { input: string }. Read web/prompts/extract.txt as system prompt. Call Anthropic (claude-haiku-4-5) with user message = input. Parse JSON array from response. Compute stats: { total, waiting: items with waiting=true, blockers: items with kind='blocker', risks: items with kind='risk' }. Return { items: ConsultItem[], stats: Stats }. Handle JSON parse errors with a 422 response.",
+      "title": "Implement POST /api/extract via Extractor Agent",
+      "description": "Create web/app/api/extract/route.ts. Use the Managed Agents pattern: (1) Read EXTRACTOR_AGENT_ID from process.env (set by TASK-023 setup script). (2) Create a session: anthropic.beta.agents.sessions.create({ agent_id: EXTRACTOR_AGENT_ID }). (3) Send the user's input text as a user message in the session. (4) Poll/stream until session completes and extract the assistant's text response. (5) JSON.parse the response into ConsultItem[]. (6) Compute stats { total, waiting, blockers, risks }. (7) Return { items, stats }. Handle missing agent ID (500) and JSON parse errors (422). Beta header required: 'managed-agents-2026-04-01'.",
       "stage": "plan",
       "owner": "codex",
       "status": "todo",
-      "dependencies": ["TASK-001", "TASK-004", "TASK-016"],
+      "dependencies": ["TASK-001", "TASK-023", "TASK-016"],
       "output": "",
       "files": ["web/app/api/extract/route.ts"],
       "updated_at": ""
@@ -176,20 +176,20 @@
       "description": "Write web/prompts/summarize.txt. System prompt that takes a JSON array of ConsultItems and returns a JSON object: { execSummary: string (2-3 HTML paragraphs using <span class='em'>, <span class='em-warn'>, <span class='em-risk'> for emphasis), clientDigest: { nextFromClient: string, nextFromUs: string, flags: string }, provenance: string }. Executive summary should call out overall status, client-gating items, and risks. Client digest should be concise bullet-style sentences.",
       "stage": "execute",
       "owner": "claude",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-001"],
-      "output": "",
+      "output": "Written at web/prompts/summarize.txt. Instructs the model to produce execSummary as styled HTML paragraphs with em/em-warn/em-risk spans, a three-field clientDigest object, and a provenance string. Includes a complete example JSON output.",
       "files": ["web/prompts/summarize.txt"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T10:35:00+0800"
     },
     {
       "id": "TASK-006",
-      "title": "Implement POST /api/summarize",
-      "description": "Create web/app/api/summarize/route.ts. Accept { items: ConsultItem[] }. Read web/prompts/summarize.txt as system prompt. Call Anthropic (claude-haiku-4-5) with user message = JSON.stringify(items). Parse and return { execSummary, clientDigest, provenance }. This replaces the separate /api/suggest and /api/draft endpoints.",
+      "title": "Implement POST /api/summarize via Execution Agent",
+      "description": "Create web/app/api/summarize/route.ts. Use the Managed Agents pattern: (1) Read EXECUTION_AGENT_ID from process.env (set by TASK-023 setup script). (2) Create a session: anthropic.beta.agents.sessions.create({ agent_id: EXECUTION_AGENT_ID }). (3) Send JSON.stringify(items) as the user message. (4) Poll/stream until session completes and extract the assistant's response text. (5) JSON.parse into { execSummary, clientDigest, provenance }. (6) Return the parsed object. Handle missing agent ID (500) and JSON parse errors (422). Beta header required: 'managed-agents-2026-04-01'.",
       "stage": "execute",
       "owner": "codex",
       "status": "todo",
-      "dependencies": ["TASK-001", "TASK-007", "TASK-016"],
+      "dependencies": ["TASK-001", "TASK-023", "TASK-016"],
       "output": "",
       "files": ["web/app/api/summarize/route.ts"],
       "updated_at": ""
@@ -240,6 +240,46 @@
       "dependencies": ["TASK-012", "TASK-013", "TASK-014"],
       "output": "",
       "files": ["web/app/page.tsx", "web/components/InputPanel.tsx", "web/components/Board.tsx", "web/components/RightPanel.tsx"],
+      "updated_at": ""
+    },
+    {
+      "id": "TASK-023",
+      "title": "Write agent system prompts (claude-owned)",
+      "description": "Write the three Managed Agent system prompt files. Each file is the system prompt that will be stored on the Agent object at agents.create() time — it does NOT go in the session message.\n\n- web/prompts/agent-extractor.txt: Extractor Agent. Extracts ConsultItems from raw text and returns a JSON array matching the ConsultItem schema.\n- web/prompts/agent-execution.txt: Execution Agent. Takes a JSON array of ConsultItems and returns { execSummary (HTML paragraphs with em/em-warn/em-risk spans), clientDigest { nextFromClient, nextFromUs, flags }, provenance }.\n- web/prompts/agent-email.txt: Email Agent. Takes { items: ConsultItem[], summary: SummaryData } and returns { subject, body, tone } for a client-facing update email.\n\nPrompts are already written. This task is done.",
+      "stage": "plan",
+      "owner": "claude",
+      "status": "done",
+      "dependencies": ["TASK-001"],
+      "output": "Written three Managed Agent system prompts: agent-extractor.txt (ConsultItem extraction with full field schema and classification rules), agent-execution.txt (executive summary + client digest with HTML em spans), agent-email.txt (client-facing update email with subject/body/tone).",
+      "files": [
+        "web/prompts/agent-extractor.txt",
+        "web/prompts/agent-execution.txt",
+        "web/prompts/agent-email.txt"
+      ],
+      "updated_at": "2026-04-24T12:00:00+0800"
+    },
+    {
+      "id": "TASK-024",
+      "title": "Create managed agents setup script",
+      "description": "Create web/scripts/setup-agents.ts. This script runs once to create the three persistent Managed Agent objects and prints their IDs for .env.local.\n\nSteps:\n1. Import Anthropic SDK with beta header 'managed-agents-2026-04-01'.\n2. Read each system prompt file from web/prompts/agent-extractor.txt, agent-execution.txt, agent-email.txt using fs.readFileSync.\n3. Call anthropic.beta.agents.create() for each:\n   - Extractor: { name: 'ConsultFlow Extractor', model: 'claude-haiku-4-5', system: <extractor prompt> }\n   - Execution: { name: 'ConsultFlow Execution', model: 'claude-haiku-4-5', system: <execution prompt> }\n   - Email: { name: 'ConsultFlow Email', model: 'claude-haiku-4-5', system: <email prompt> }\n4. Print the three agent IDs to stdout in .env format:\n   EXTRACTOR_AGENT_ID=<id>\n   EXECUTION_AGENT_ID=<id>\n   EMAIL_AGENT_ID=<id>\n5. Append these to web/.env.local automatically.\n\nAdd a package.json script: 'setup-agents': 'npx tsx scripts/setup-agents.ts'\n\nIMPORTANT: agents.create() is called only once. Subsequent calls create new agents (waste money). The script should check if IDs already exist in .env.local and skip re-creation.",
+      "stage": "plan",
+      "owner": "codex",
+      "status": "todo",
+      "dependencies": ["TASK-023", "TASK-016"],
+      "output": "",
+      "files": ["web/scripts/setup-agents.ts", "web/package.json", "web/.env.local"],
+      "updated_at": ""
+    },
+    {
+      "id": "TASK-025",
+      "title": "Implement POST /api/email via Email Agent",
+      "description": "Create web/app/api/email/route.ts. Use the Managed Agents pattern:\n1. Read EMAIL_AGENT_ID from process.env.\n2. Create a session: anthropic.beta.agents.sessions.create({ agent_id: EMAIL_AGENT_ID }).\n3. Send JSON.stringify({ items, summary }) as the user message, where items: ConsultItem[] and summary: SummaryData come from the request body.\n4. Poll/stream until session completes and extract the assistant response text.\n5. JSON.parse into { subject: string, body: string, tone: string }.\n6. Return the parsed object.\nHandle missing agent ID (500) and JSON parse errors (422).\nBeta header required: 'managed-agents-2026-04-01'.",
+      "stage": "communicate",
+      "owner": "codex",
+      "status": "todo",
+      "dependencies": ["TASK-023", "TASK-024", "TASK-016"],
+      "output": "",
+      "files": ["web/app/api/email/route.ts"],
       "updated_at": ""
     }
   ]
