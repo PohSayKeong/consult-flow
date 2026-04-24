@@ -5,3 +5,5 @@ web/tsconfig.tsbuildinfo
 ConsultFlow-demo.mp4
 consult-flow-video/out/
 consult-flow-video/build/
+consult-flow-video/out.mp4
+/consult-flow-video/build

@@ -135,7 +135,7 @@ module.exports = function cssWithMappingToString(item) {
 
 /***/ },
 
-/***/ 7752
+/***/ 1095
 (__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) {
 
 
@@ -192,7 +192,10 @@ var update = injectStylesIntoStyleTag_default()(index_js_src/* default */.A, opt
 
 ;// ./src/consultflow.png
 const consultflow_namespaceObject = __webpack_require__.p + "c0aea4dfdd6cf95c.png";
+;// ./src/anthropic-1.svg
+const anthropic_1_namespaceObject = __webpack_require__.p + "115d9bc583165dd5.svg";
 ;// ./src/IntroOutro.tsx
+
 
 
 
@@ -211,6 +214,16 @@ const COLORS = {
   ok: "#22c55e",
   info: "#38bdf8"
 };
+const SLIDE = 75;
+const FADE_IN = 15;
+const fadeIn = (localF) => (0,esm.interpolate)(localF, [0, FADE_IN], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+const SCENES = {
+  intro: { start: 0, end: SLIDE },
+  pills: { start: SLIDE, end: SLIDE * 2 },
+  sources: { start: SLIDE * 2, end: SLIDE * 3 },
+  agents: { start: SLIDE * 3, end: SLIDE * 4 }
+};
+const totalFrames = SLIDE * 4;
 const GmailIcon = () => /* @__PURE__ */ (0,jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "56", height: "56", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
   /* @__PURE__ */ (0,jsx_runtime.jsx)("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2", fill: "#EA4335" }),
   /* @__PURE__ */ (0,jsx_runtime.jsx)("path", { d: "M2 7l10 7.5L22 7", stroke: "white", strokeWidth: "2" })
@@ -250,26 +263,13 @@ const SOURCES = [
   { name: "Zoom", icon: /* @__PURE__ */ (0,jsx_runtime.jsx)(ZoomIcon, {}), color: "#2D8CFF" },
   { name: "Text", icon: /* @__PURE__ */ (0,jsx_runtime.jsx)(TextIcon, {}), color: COLORS.accent }
 ];
-const SCENES = {
-  intro: { start: 0, end: 270 },
-  pills: { start: 270, end: 510 },
-  sources: { start: 480, end: 720 },
-  agents: { start: 690, end: 930 },
-  outro: { start: 900, end: 1050 }
-};
-const totalFrames = 1050;
 const Intro = () => {
   const f = (0,esm.useCurrentFrame)();
-  const inRange = f >= SCENES.intro.start && f < SCENES.intro.end;
-  if (!inRange) return null;
-  const localF = f - SCENES.intro.start;
-  const mainFade = (0,esm.interpolate)(localF, [0, 30, 240, 270], [0, 1, 1, 0], { extrapolateClamp: true });
-  const subFade = (0,esm.interpolate)(localF, [30, 70], [0, 1], { extrapolateClamp: true });
-  const headline = (0,esm.interpolate)(localF, [80, 120], [0, 1], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center", opacity: mainFade }, children: [
+  if (f < SCENES.intro.start || f >= SCENES.intro.end) return null;
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: fadeIn(f - SCENES.intro.start) }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
     /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: consultflow_namespaceObject, style: { width: 500, height: "auto" } }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 36, color: COLORS["fg-dim"], marginTop: 32, opacity: subFade, fontFamily: "Space Grotesk, sans-serif" }, children: "AI-Powered Consulting Workflow" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { marginTop: 64, opacity: headline }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 36, color: COLORS["fg-dim"], marginTop: 32, fontFamily: "Space Grotesk, sans-serif" }, children: "AI-Powered Consulting Workflow" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { marginTop: 64 }, children: [
       /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 28, color: COLORS["fg-mute"], marginBottom: 16 }, children: "Turn messy client interactions into" }),
       /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 44, color: COLORS.accent, fontWeight: 700 }, children: "organized action, instantly" })
     ] })
@@ -277,123 +277,86 @@ const Intro = () => {
 };
 const PillsSlide = () => {
   const f = (0,esm.useCurrentFrame)();
-  const inRange = f >= SCENES.pills.start && f < SCENES.pills.end;
-  if (!inRange) return null;
-  const localF = f - SCENES.pills.start;
-  const mainFade = (0,esm.interpolate)(localF, [0, 30, 210, 240], [0, 1, 1, 0], { extrapolateClamp: true });
-  const pill1 = (0,esm.interpolate)(localF, [30, 70], [0, 1], { extrapolateClamp: true });
-  const pill2 = (0,esm.interpolate)(localF, [50, 90], [0, 1], { extrapolateClamp: true });
-  const pill3 = (0,esm.interpolate)(localF, [70, 110], [0, 1], { extrapolateClamp: true });
-  const pill4 = (0,esm.interpolate)(localF, [90, 130], [0, 1], { extrapolateClamp: true });
-  const desc = (0,esm.interpolate)(localF, [120, 160], [0, 1], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center", opacity: mainFade }, children: [
+  if (f < SCENES.pills.start || f >= SCENES.pills.end) return null;
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: fadeIn(f - SCENES.pills.start) }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
     /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 32, color: COLORS["fg-mute"], marginBottom: 48 }, children: "Everything you need to stay on top of client work" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", flexDirection: "column", gap: 24, maxWidth: 900, alignItems: "center" }, children: FEATURES.map((feat, i) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { padding: "24px 40px", borderRadius: 20, fontSize: 22, color: COLORS.fg, backgroundColor: COLORS["bg-2"], border: `1px solid ${COLORS.line}`, opacity: [pill1, pill2, pill3, pill4][i], width: 700, textAlign: "left", display: "flex", alignItems: "center", gap: 20 }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", flexDirection: "column", gap: 24, maxWidth: 900, alignItems: "center" }, children: FEATURES.map((feat) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { padding: "24px 40px", borderRadius: 20, fontSize: 22, color: COLORS.fg, backgroundColor: COLORS["bg-2"], border: `1px solid ${COLORS.line}`, width: 700, textAlign: "left", display: "flex", alignItems: "center", gap: 20 }, children: [
       /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: 40, height: 40, borderRadius: "50%", backgroundColor: COLORS.accent, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "24", height: "24", fill: "none", stroke: "white", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0,jsx_runtime.jsx)("polyline", { points: "20 6 9 17 4 12" }) }) }),
       feat
     ] }, feat)) }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 24, color: COLORS.accent, marginTop: 48, opacity: desc }, children: "All of this, powered by AI" })
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 24, color: COLORS.accent, marginTop: 48 }, children: "All of this, powered by AI" })
   ] }) });
 };
 const SourcesSlide = () => {
   const f = (0,esm.useCurrentFrame)();
-  const inRange = f >= SCENES.sources.start && f < SCENES.sources.end;
-  if (!inRange) return null;
-  const localF = f - SCENES.sources.start;
-  const mainFade = (0,esm.interpolate)(localF, [0, 30, 210, 240], [0, 1, 1, 0], { extrapolateClamp: true });
-  const title = (0,esm.interpolate)(localF, [20, 60], [0, 1], { extrapolateClamp: true });
-  const src1 = (0,esm.interpolate)(localF, [50, 90], [0, 1], { extrapolateClamp: true });
-  const src2 = (0,esm.interpolate)(localF, [70, 110], [0, 1], { extrapolateClamp: true });
-  const src3 = (0,esm.interpolate)(localF, [90, 130], [0, 1], { extrapolateClamp: true });
-  const bar = (0,esm.interpolate)(localF, [110, 150], [0, 1], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: mainFade }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 36, color: COLORS["fg-mute"], marginBottom: 56, opacity: title }, children: "Connect your data from anywhere" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", gap: 32, justifyContent: "center", marginBottom: 56 }, children: SOURCES.map((src, i) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { width: 160, height: 160, borderRadius: 28, backgroundColor: COLORS["bg-2"], border: `2px solid ${src.color}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", opacity: [src1, src2, src3][i] }, children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { marginBottom: 12 }, children: src.icon }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 20, color: COLORS.fg, fontWeight: 600 }, children: src.name })
+  if (f < SCENES.sources.start || f >= SCENES.sources.end) return null;
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: fadeIn(f - SCENES.sources.start) }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 48, color: COLORS["fg-mute"], marginBottom: 56 }, children: "Connect your data from anywhere" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", gap: 40, justifyContent: "center", marginBottom: 56 }, children: SOURCES.map((src) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { width: 200, height: 200, borderRadius: 32, backgroundColor: COLORS["bg-2"], border: `2px solid ${src.color}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { marginBottom: 12, transform: "scale(1.3)" }, children: src.icon }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 26, color: COLORS.fg, fontWeight: 600 }, children: src.name })
     ] }, src.name)) }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 24, padding: "20px 40px", backgroundColor: COLORS["bg-1"], borderRadius: 20, border: `1px solid ${COLORS.line}`, opacity: bar }, children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, color: COLORS["fg-mute"] }, children: "\u2192" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 32, padding: "24px 52px", backgroundColor: COLORS["bg-1"], borderRadius: 20, border: `1px solid ${COLORS.line}` }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 48, color: COLORS["fg-mute"] }, children: "\u2192" }),
       /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 24, color: COLORS.fg, fontWeight: 700 }, children: "AI Processing" }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 18, color: COLORS["fg-dim"] }, children: "Extracts commitments, blockers, risks" })
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 30, color: COLORS.fg, fontWeight: 700 }, children: "AI Processing" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 22, color: COLORS["fg-dim"] }, children: "Extracts commitments, blockers, risks" })
       ] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, color: COLORS["fg-mute"] }, children: "\u2192" }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 48, color: COLORS["fg-mute"] }, children: "\u2192" }),
       /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 24, color: COLORS.accent, fontWeight: 700 }, children: "ConsultFlow" }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 18, color: COLORS["fg-dim"] }, children: "Organized dashboard" })
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 30, color: COLORS.accent, fontWeight: 700 }, children: "ConsultFlow" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 22, color: COLORS["fg-dim"] }, children: "Organized dashboard" })
       ] })
     ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 22, color: COLORS["fg-mute"], marginTop: 56, opacity: bar }, children: "Gmail \u2022 Zoom \u2022 Slack \u2022 Teams \u2022 Text \u2022 More coming soon" })
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 28, color: COLORS["fg-mute"], marginTop: 56 }, children: "Gmail \u2022 Zoom \u2022 Slack \u2022 Teams \u2022 Text \u2022 More coming soon" })
   ] }) });
 };
 const AgentsSlide = () => {
   const f = (0,esm.useCurrentFrame)();
-  const inRange = f >= SCENES.agents.start && f < SCENES.agents.end;
-  if (!inRange) return null;
-  const localF = f - SCENES.agents.start;
-  const mainFade = (0,esm.interpolate)(localF, [0, 30, 210, 240], [0, 1, 1, 0], { extrapolateClamp: true });
-  const title = (0,esm.interpolate)(localF, [20, 60], [0, 1], { extrapolateClamp: true });
-  const agent1 = (0,esm.interpolate)(localF, [60, 100], [0, 1], { extrapolateClamp: true });
-  const agent2 = (0,esm.interpolate)(localF, [80, 120], [0, 1], { extrapolateClamp: true });
-  const agent3 = (0,esm.interpolate)(localF, [100, 140], [0, 1], { extrapolateClamp: true });
-  const connect = (0,esm.interpolate)(localF, [140, 180], [0, 1], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: mainFade }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 36, color: COLORS["fg-mute"], marginBottom: 56, opacity: title }, children: "Powered by Claude Managed Agents" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", gap: 32, justifyContent: "center", marginBottom: 56 }, children: AGENTS.map((agent, i) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { width: 240, padding: "32px 24px", borderRadius: 28, backgroundColor: COLORS["bg-2"], border: `2px solid ${i === 0 ? COLORS.info : i === 1 ? COLORS.accent : COLORS.ok}`, display: "flex", flexDirection: "column", alignItems: "center", opacity: [agent1, agent2, agent3][i] }, children: [
+  if (f < SCENES.agents.start || f >= SCENES.agents.end) return null;
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: fadeIn(f - SCENES.agents.start) }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 36, color: COLORS["fg-mute"], marginBottom: 56 }, children: "Powered by Claude Managed Agents" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", gap: 32, justifyContent: "center", marginBottom: 56 }, children: AGENTS.map((agent, i) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { width: 240, padding: "32px 24px", borderRadius: 28, backgroundColor: COLORS["bg-2"], border: `2px solid ${i === 0 ? COLORS.info : i === 1 ? COLORS.accent : COLORS.ok}`, display: "flex", flexDirection: "column", alignItems: "center" }, children: [
       /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { marginBottom: 20, transform: "scale(1.4)" }, children: agent.icon }),
       /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 26, color: COLORS.fg, fontWeight: 700, marginBottom: 10 }, children: agent.name }),
       /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 18, color: COLORS["fg-dim"] }, children: agent.desc })
     ] }, agent.name)) }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", alignItems: "center", gap: 20, padding: "20px 40px", backgroundColor: COLORS["bg-1"], borderRadius: 20, border: `2px solid ${COLORS.accent}`, opacity: connect }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 16, color: COLORS["fg-mute"] }, children: "Each agent is a specialized Claude instance that runs autonomously" }) })
-  ] }) });
-};
-const Outro = () => {
-  const f = (0,esm.useCurrentFrame)();
-  const inRange = f >= SCENES.outro.start && f < SCENES.outro.end;
-  if (!inRange) return null;
-  const localF = f - SCENES.outro.start;
-  const mainFade = (0,esm.interpolate)(localF, [0, 30, 120, 150], [0, 1, 1, 0], { extrapolateClamp: true });
-  const subtitle = (0,esm.interpolate)(localF, [20, 60], [0, 1], { extrapolateClamp: true });
-  const cta = (0,esm.interpolate)(localF, [80, 120], [0, 1], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center", opacity: mainFade }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 32, color: COLORS["fg-mute"], opacity: subtitle }, children: "From chaos to clarity" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: consultflow_namespaceObject, style: { width: 450, height: "auto", marginTop: 32 } }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 56, fontWeight: 700, color: COLORS.accent, marginTop: 48, opacity: cta }, children: "Stop tracking." }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 56, fontWeight: 700, color: COLORS.accent, opacity: cta }, children: "Start consulting." }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", gap: 40, justifyContent: "center", marginTop: 72 }, children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, fontWeight: 700, color: COLORS.ok }, children: "80%" }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 16, color: COLORS["fg-mute"] }, children: "less manual work" })
-      ] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: 2, backgroundColor: COLORS.line } }),
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, fontWeight: 700, color: COLORS.info }, children: "10x" }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 16, color: COLORS["fg-mute"] }, children: "faster follow-ups" })
-      ] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: 2, backgroundColor: COLORS.line } }),
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, fontWeight: 700, color: COLORS.accent }, children: "100%" }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 16, color: COLORS["fg-mute"] }, children: "client visibility" })
-      ] })
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 20, padding: "20px 40px", backgroundColor: COLORS["bg-1"], borderRadius: 20, border: `2px solid ${COLORS.accent}` }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: anthropic_1_namespaceObject, style: { width: 36, height: 36, filter: "brightness(0.6)" } }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 16, color: COLORS["fg-mute"] }, children: "Each agent is a specialized Claude instance that runs autonomously" })
     ] })
   ] }) });
 };
 
+;// ./src/demo.mp4
+const demo_namespaceObject = __webpack_require__.p + "caad758e999ae484.mp4";
 ;// ./src/Composition.tsx
 
 
 
 
 
+
+const DEMO_START = 300;
+const DEMO_FRAMES = 3313;
+const FADE = 30;
+const DemoScene = () => {
+  const f = (0,esm.useCurrentFrame)();
+  const opacity = (0,esm.interpolate)(
+    f,
+    [0, FADE, DEMO_FRAMES - FADE, DEMO_FRAMES],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { opacity }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.OffthreadVideo, { src: demo_namespaceObject, style: { width: "100%", height: "100%", objectFit: "cover" } }) });
+};
 function VideoTimeline() {
-  const frame = (0,esm.useCurrentFrame)();
   return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { children: [
     /* @__PURE__ */ (0,jsx_runtime.jsx)(Intro, {}),
     /* @__PURE__ */ (0,jsx_runtime.jsx)(PillsSlide, {}),
     /* @__PURE__ */ (0,jsx_runtime.jsx)(SourcesSlide, {}),
     /* @__PURE__ */ (0,jsx_runtime.jsx)(AgentsSlide, {}),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)(Outro, {})
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Sequence, { from: DEMO_START, durationInFrames: DEMO_FRAMES, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(DemoScene, {}) })
   ] });
 }
 const RemotionVideo = () => {
@@ -401,7 +364,7 @@ const RemotionVideo = () => {
     esm.Composition,
     {
       id: "ConsultFlow",
-      durationInFrames: totalFrames,
+      durationInFrames: DEMO_START + DEMO_FRAMES,
       fps: 30,
       width: 1920,
       height: 1080,
@@ -28618,7 +28581,7 @@ var NoReactInternals = {
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	__webpack_require__(6507);
-/******/ 	__webpack_require__(7752);
+/******/ 	__webpack_require__(1095);
 /******/ 	__webpack_require__(3610);
 /******/ 	var __webpack_exports__ = __webpack_require__(3482);
 /******/ 	
