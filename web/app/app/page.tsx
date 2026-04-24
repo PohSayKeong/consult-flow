@@ -138,8 +138,10 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [isSummarizingDelay, setIsSummarizingDelay] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [emailResult, setEmailResult] = useState<{ tone: string } | null>(null);
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [actionResults, setActionResults] = useState<
     Record<string, AutoActionResult>
   >({});
@@ -287,14 +289,24 @@ export default function Home() {
     [handleStatusChange],
   );
 
-  const handleSendEmail = useCallback(async () => {
+  const handleSendEmail = useCallback(() => {
+    if (!summary || showEmailPreview || emailResult) return;
+    setShowEmailPreview(true);
+  }, [summary, showEmailPreview, emailResult]);
+
+  const handleConfirmSendEmail = useCallback(async () => {
     if (emailResult || isSendingEmail) return;
 
     setIsSendingEmail(true);
     await new Promise((r) => setTimeout(r, 1200));
     setEmailResult({ tone: "Formal" });
+    setShowEmailPreview(false);
     setIsSendingEmail(false);
   }, [emailResult, isSendingEmail]);
+
+  const handleCancelSendEmail = useCallback(() => {
+    setShowEmailPreview(false);
+  }, []);
 
   const parseSourceTab = useCallback(
     async (tab: SourceTab) => {
@@ -362,12 +374,17 @@ export default function Home() {
   );
 
   const handleGenerateSummary = useCallback(async () => {
-    if (isSummarizing) {
+    if (isSummarizing || isSummarizingDelay) {
       return;
     }
 
     setIsSummarizing(true);
+    setIsSummarizingDelay(true);
     setSummaryError(null);
+
+    window.setTimeout(() => {
+      setIsSummarizingDelay(false);
+    }, 1500);
 
     try {
       const digestItems = digestIds
@@ -538,12 +555,17 @@ export default function Home() {
                     onGenerateSummary={handleGenerateSummary}
                     onSendEmail={handleSendEmail}
                     isGeneratingSummary={isSummarizing}
+                    isSummarizingDelay={isSummarizingDelay}
                     isSendingEmail={isSendingEmail}
                     emailSent={!!emailResult}
+                    showEmailPreview={showEmailPreview}
+                    emailPreviewContent={summary?.execSummary.replace(/<[^>]+>/g, "")}
                     actionResults={actionResults}
                     runningAction={runningAction}
                     onRunAction={handleRunAction}
                     onActionsComplete={handleActionsComplete}
+                    onConfirmSendEmail={handleConfirmSendEmail}
+                    onCancelSendEmail={handleCancelSendEmail}
                   />
                   {summaryError ? (
                     <div className="mt-3 rounded-[8px] border border-[var(--warn-weak)] bg-[rgba(65,46,17,0.5)] px-3 py-2 text-sm text-warn">

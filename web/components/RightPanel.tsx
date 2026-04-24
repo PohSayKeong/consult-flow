@@ -17,11 +17,16 @@ type RightPanelProps = {
   onSendEmail?: () => void;
   isGeneratingSummary?: boolean;
   isSendingEmail?: boolean;
+  isSummarizingDelay?: boolean;
   emailSent?: boolean;
+  showEmailPreview?: boolean;
+  emailPreviewContent?: string;
   actionResults?: Record<string, AutoActionResult>;
   runningAction?: string | null;
   onRunAction?: (itemId: string, action: string) => void;
   onActionsComplete?: (itemId: string) => void;
+  onConfirmSendEmail?: () => void;
+  onCancelSendEmail?: () => void;
 };
 
 type ActionToConfirm = { itemId: string; action: string; label: string } | null;
@@ -87,8 +92,13 @@ function SummaryMode({
   onSendEmail,
   isGeneratingSummary,
   isSendingEmail,
+  isSummarizingDelay,
   emailSent,
+  showEmailPreview,
+  emailPreviewContent,
   onSelectItem,
+onConfirmSendEmail,
+  onCancelSendEmail,
 }: {
   items: ConsultItem[];
   summary: SummaryData | null;
@@ -97,8 +107,13 @@ function SummaryMode({
   onSendEmail: (() => void) | undefined;
   isGeneratingSummary: boolean;
   isSendingEmail: boolean;
+  isSummarizingDelay?: boolean;
   emailSent: boolean;
+  showEmailPreview?: boolean;
+  emailPreviewContent?: string;
   onSelectItem: ((id: string) => void) | undefined;
+  onConfirmSendEmail?: () => void;
+  onCancelSendEmail?: () => void;
 }) {
   if (items.length === 0) {
     return (
@@ -189,10 +204,10 @@ function SummaryMode({
             <button
               type="button"
               onClick={onGenerateSummary}
-              disabled={isGeneratingSummary}
+              disabled={isGeneratingSummary || isSummarizingDelay}
               className="mt-4 w-full rounded-md bg-accent px-3 py-2 text-sm font-semibold text-bg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isGeneratingSummary ? "Generating…" : "Generate summary"}
+              {isGeneratingSummary || isSummarizingDelay ? "Generating summary..." : "Generate summary"}
             </button>
           ) : null}
         </div>
@@ -273,14 +288,14 @@ function SummaryMode({
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex items-center gap-3">
-<button
+<div className="mt-4 flex items-center gap-3">
+              <button
                 type="button"
                 onClick={onSendEmail}
-                disabled={isSendingEmail || digestIds.length === 0}
+                disabled={isSendingEmail || !summary || emailSent}
                 className="rounded-md border border-accent bg-transparent px-3 py-2 text-sm text-accent transition hover:bg-accent hover:text-bg disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isSendingEmail ? "Sending…" : emailSent ? "Sent to client" : "Send digest"}
+                {isSendingEmail ? "Sending…" : emailSent ? "Sent to client" : "Preview & send"}
               </button>
               {emailSent && (
                 <span className="text-[11px] text-fg-faint">Formal tone</span>
@@ -292,6 +307,41 @@ function SummaryMode({
             {summary.provenance}
           </div>
         </>
+      ) : null}
+
+      {showEmailPreview && emailPreviewContent ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-[480px] max-h-[80vh] overflow-y-auto rounded-lg border border-line bg-bg-2 p-4 shadow-xl">
+            <div className="text-base font-semibold text-fg">Preview email</div>
+            <div className="mt-3 space-y-2 text-sm">
+              <div className="text-fg-mute">To: Sarah Chen &lt;s.chen@acmecorp.com&gt;</div>
+              <div className="text-fg-mute">Subject: Acme Corp — Apr 24 Update</div>
+            </div>
+            <div className="mt-4 rounded-md border border-line bg-bg-1 p-3">
+              <pre className="whitespace-pre-wrap text-[12px] leading-relaxed text-fg font-sans">
+                {emailPreviewContent}
+              </pre>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={onConfirmSendEmail}
+                disabled={isSendingEmail}
+                className="flex-1 rounded-md bg-accent px-3 py-2 text-sm font-semibold text-bg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSendingEmail ? "Sending..." : "Send now"}
+              </button>
+              <button
+                type="button"
+                onClick={onCancelSendEmail}
+                disabled={isSendingEmail}
+                className="flex-1 rounded-md border border-line bg-bg-1 px-3 py-2 text-sm text-fg-dim transition hover:border-line-2 hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
     </div>
   );
@@ -673,11 +723,16 @@ export default function RightPanel({
   onSendEmail,
   isGeneratingSummary = false,
   isSendingEmail = false,
+  isSummarizingDelay = false,
   emailSent = false,
+  showEmailPreview = false,
+  emailPreviewContent,
   actionResults,
   runningAction,
   onRunAction,
   onActionsComplete,
+  onConfirmSendEmail,
+  onCancelSendEmail,
 }: RightPanelProps) {
   const [copied, setCopied] = useState(false);
 
@@ -757,8 +812,13 @@ export default function RightPanel({
             onSendEmail={onSendEmail}
             isGeneratingSummary={isGeneratingSummary}
             isSendingEmail={isSendingEmail}
+            isSummarizingDelay={isSummarizingDelay}
             emailSent={emailSent}
+            showEmailPreview={showEmailPreview}
+            emailPreviewContent={emailPreviewContent}
             onSelectItem={onSelectItem}
+            onConfirmSendEmail={onConfirmSendEmail}
+            onCancelSendEmail={onCancelSendEmail}
           />
         )}
       </div>
