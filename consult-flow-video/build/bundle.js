@@ -16,8 +16,9 @@
 
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_remotion_bundler_css_loader_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_remotion_bundler_css_loader_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+___CSS_LOADER_EXPORT___.push([module.id, "@import url(https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap);"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "/*! tailwindcss v4.2.0 | MIT License | https://tailwindcss.com */\n@layer properties;\n@layer theme, base, components, utilities;\n@layer theme {\n  :root, :host {\n    --font-sans: ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\",\n      \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\";\n    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,\n      \"Liberation Mono\", \"Courier New\", monospace;\n    --spacing: 0.25rem;\n    --default-font-family: var(--font-sans);\n    --default-font-feature-settings: var(--font-sans--font-feature-settings);\n    --default-font-variation-settings: var(\n      --font-sans--font-variation-settings\n    );\n    --default-mono-font-family: var(--font-mono);\n    --default-mono-font-feature-settings: var(\n      --font-mono--font-feature-settings\n    );\n    --default-mono-font-variation-settings: var(\n      --font-mono--font-variation-settings\n    );\n  }\n}\n@layer base {\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n    border: 0 solid;\n  }\n  html, :host {\n    line-height: 1.5;\n    -webkit-text-size-adjust: 100%;\n    tab-size: 4;\n    font-family: var( --default-font-family, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\" );\n    font-feature-settings: var(--default-font-feature-settings, normal);\n    font-variation-settings: var( --default-font-variation-settings, normal );\n    -webkit-tap-highlight-color: transparent;\n  }\n  body {\n    line-height: inherit;\n  }\n  hr {\n    height: 0;\n    color: inherit;\n    border-top-width: 1px;\n  }\n  abbr:where([title]) {\n    -webkit-text-decoration: underline dotted;\n    text-decoration: underline dotted;\n  }\n  h1, h2, h3, h4, h5, h6 {\n    font-size: inherit;\n    font-weight: inherit;\n  }\n  a {\n    color: inherit;\n    -webkit-text-decoration: inherit;\n    text-decoration: inherit;\n  }\n  b, strong {\n    font-weight: bolder;\n  }\n  code, kbd, samp, pre {\n    font-family: var( --default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace );\n    font-feature-settings: var( --default-mono-font-feature-settings, normal );\n    font-variation-settings: var( --default-mono-font-variation-settings, normal );\n    font-size: 1em;\n  }\n  small {\n    font-size: 80%;\n  }\n  sub, sup {\n    font-size: 75%;\n    line-height: 0;\n    position: relative;\n    vertical-align: baseline;\n  }\n  sub {\n    bottom: -0.25em;\n  }\n  sup {\n    top: -0.5em;\n  }\n  table {\n    text-indent: 0;\n    border-color: inherit;\n    border-collapse: collapse;\n  }\n  :-moz-focusring {\n    outline: auto;\n  }\n  progress {\n    vertical-align: baseline;\n  }\n  summary {\n    display: list-item;\n  }\n  ol, ul, menu {\n    list-style: none;\n  }\n  img, svg, video, canvas, audio, iframe, embed, object {\n    display: block;\n    vertical-align: middle;\n  }\n  img, video {\n    max-width: 100%;\n    height: auto;\n  }\n  button, input, select, optgroup, textarea, ::file-selector-button {\n    font: inherit;\n    font-feature-settings: inherit;\n    font-variation-settings: inherit;\n    letter-spacing: inherit;\n    color: inherit;\n    border-radius: 0;\n    background-color: transparent;\n    opacity: 1;\n  }\n  :where(select:is([multiple], [size])) optgroup {\n    font-weight: bolder;\n  }\n  :where(select:is([multiple], [size])) optgroup option {\n    padding-inline-start: 20px;\n  }\n  ::file-selector-button {\n    margin-inline-end: 4px;\n  }\n  ::placeholder {\n    opacity: 1;\n    color: currentColor;\n    @supports (color: color-mix(in lab, red, red)) {\n      color: color-mix(in oklab, currentColor 50%, transparent);\n    }\n  }\n  textarea {\n    resize: vertical;\n  }\n  ::-webkit-search-decoration {\n    -webkit-appearance: none;\n  }\n  ::-webkit-date-and-time-value {\n    min-height: 1lh;\n    text-align: inherit;\n  }\n  ::-webkit-datetime-edit {\n    display: inline-flex;\n  }\n  ::-webkit-datetime-edit-fields-wrapper {\n    padding: 0;\n  }\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\n    padding-block: 0;\n  }\n  :-moz-ui-invalid {\n    box-shadow: none;\n  }\n  button, input:where([type=\"button\"], [type=\"reset\"], [type=\"submit\"]), ::file-selector-button {\n    appearance: button;\n  }\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\n    height: auto;\n  }\n  [hidden]:where(:not([hidden=\"until-found\"])) {\n    display: none !important;\n  }\n}\n@layer utilities {\n  .absolute {\n    position: absolute;\n  }\n  .start {\n    inset-inline-start: var(--spacing);\n  }\n  .end {\n    inset-inline-end: var(--spacing);\n  }\n  .flex {\n    display: flex;\n  }\n  .grid {\n    display: grid;\n  }\n  .hidden {\n    display: none;\n  }\n  .transform {\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\n  }\n  .border {\n    border-style: var(--tw-border-style);\n    border-width: 1px;\n  }\n}\n@property --tw-rotate-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-z {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-border-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@layer properties {\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\n    *, ::before, ::after, ::backdrop {\n      --tw-rotate-x: initial;\n      --tw-rotate-y: initial;\n      --tw-rotate-z: initial;\n      --tw-skew-x: initial;\n      --tw-skew-y: initial;\n      --tw-border-style: solid;\n    }\n  }\n}\n", "",{"version":3,"sources":["webpack://./src/index.css"],"names":[],"mappings":"AAAA,gEAAgE;AAChE,iBAAiB;AACjB,yCAAyC;AACzC;EACE;IACE;6DACyD;IACzD;iDAC6C;IAC7C,kBAAkB;IAClB,uCAAuC;IACvC,wEAAwE;IACxE;;KAEC;IACD,4CAA4C;IAC5C;;KAEC;IACD;;KAEC;EACH;AACF;AACA;EACE;IACE,sBAAsB;IACtB,SAAS;IACT,UAAU;IACV,eAAe;EACjB;EACA;IACE,gBAAgB;IAChB,8BAA8B;IAC9B,WAAW;IACX,6JAA6J;IAC7J,mEAAmE;IACnE,yEAAyE;IACzE,wCAAwC;EAC1C;EACA;IACE,oBAAoB;EACtB;EACA;IACE,SAAS;IACT,cAAc;IACd,qBAAqB;EACvB;EACA;IACE,yCAAyC;IACzC,iCAAiC;EACnC;EACA;IACE,kBAAkB;IAClB,oBAAoB;EACtB;EACA;IACE,cAAc;IACd,gCAAgC;IAChC,wBAAwB;EAC1B;EACA;IACE,mBAAmB;EACrB;EACA;IACE,kJAAkJ;IAClJ,0EAA0E;IAC1E,8EAA8E;IAC9E,cAAc;EAChB;EACA;IACE,cAAc;EAChB;EACA;IACE,cAAc;IACd,cAAc;IACd,kBAAkB;IAClB,wBAAwB;EAC1B;EACA;IACE,eAAe;EACjB;EACA;IACE,WAAW;EACb;EACA;IACE,cAAc;IACd,qBAAqB;IACrB,yBAAyB;EAC3B;EACA;IACE,aAAa;EACf;EACA;IACE,wBAAwB;EAC1B;EACA;IACE,kBAAkB;EACpB;EACA;IACE,gBAAgB;EAClB;EACA;IACE,cAAc;IACd,sBAAsB;EACxB;EACA;IACE,eAAe;IACf,YAAY;EACd;EACA;IACE,aAAa;IACb,8BAA8B;IAC9B,gCAAgC;IAChC,uBAAuB;IACvB,cAAc;IACd,gBAAgB;IAChB,6BAA6B;IAC7B,UAAU;EACZ;EACA;IACE,mBAAmB;EACrB;EACA;IACE,0BAA0B;EAC5B;EACA;IACE,sBAAsB;EACxB;EACA;IACE,UAAU;IACV,mBAAmB;IACnB;MACE,yDAAyD;IAC3D;EACF;EACA;IACE,gBAAgB;EAClB;EACA;IACE,wBAAwB;EAC1B;EACA;IACE,eAAe;IACf,mBAAmB;EACrB;EACA;IACE,oBAAoB;EACtB;EACA;IACE,UAAU;EACZ;EACA;IACE,gBAAgB;EAClB;EACA;IACE,gBAAgB;EAClB;EACA;IACE,kBAAkB;EACpB;EACA;IACE,YAAY;EACd;EACA;IACE,wBAAwB;EAC1B;AACF;AACA;EACE;IACE,kBAAkB;EACpB;EACA;IACE,kCAAkC;EACpC;EACA;IACE,gCAAgC;EAClC;EACA;IACE,aAAa;EACf;EACA;IACE,aAAa;EACf;EACA;IACE,aAAa;EACf;EACA;IACE,0GAA0G;EAC5G;EACA;IACE,oCAAoC;IACpC,iBAAiB;EACnB;AACF;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;EACf,oBAAoB;AACtB;AACA;EACE;IACE;MACE,sBAAsB;MACtB,sBAAsB;MACtB,sBAAsB;MACtB,oBAAoB;MACpB,oBAAoB;MACpB,wBAAwB;IAC1B;EACF;AACF","sourcesContent":["/*! tailwindcss v4.2.0 | MIT License | https://tailwindcss.com */\n@layer properties;\n@layer theme, base, components, utilities;\n@layer theme {\n  :root, :host {\n    --font-sans: ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\",\n      \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\";\n    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,\n      \"Liberation Mono\", \"Courier New\", monospace;\n    --spacing: 0.25rem;\n    --default-font-family: var(--font-sans);\n    --default-font-feature-settings: var(--font-sans--font-feature-settings);\n    --default-font-variation-settings: var(\n      --font-sans--font-variation-settings\n    );\n    --default-mono-font-family: var(--font-mono);\n    --default-mono-font-feature-settings: var(\n      --font-mono--font-feature-settings\n    );\n    --default-mono-font-variation-settings: var(\n      --font-mono--font-variation-settings\n    );\n  }\n}\n@layer base {\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n    border: 0 solid;\n  }\n  html, :host {\n    line-height: 1.5;\n    -webkit-text-size-adjust: 100%;\n    tab-size: 4;\n    font-family: var( --default-font-family, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\" );\n    font-feature-settings: var(--default-font-feature-settings, normal);\n    font-variation-settings: var( --default-font-variation-settings, normal );\n    -webkit-tap-highlight-color: transparent;\n  }\n  body {\n    line-height: inherit;\n  }\n  hr {\n    height: 0;\n    color: inherit;\n    border-top-width: 1px;\n  }\n  abbr:where([title]) {\n    -webkit-text-decoration: underline dotted;\n    text-decoration: underline dotted;\n  }\n  h1, h2, h3, h4, h5, h6 {\n    font-size: inherit;\n    font-weight: inherit;\n  }\n  a {\n    color: inherit;\n    -webkit-text-decoration: inherit;\n    text-decoration: inherit;\n  }\n  b, strong {\n    font-weight: bolder;\n  }\n  code, kbd, samp, pre {\n    font-family: var( --default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace );\n    font-feature-settings: var( --default-mono-font-feature-settings, normal );\n    font-variation-settings: var( --default-mono-font-variation-settings, normal );\n    font-size: 1em;\n  }\n  small {\n    font-size: 80%;\n  }\n  sub, sup {\n    font-size: 75%;\n    line-height: 0;\n    position: relative;\n    vertical-align: baseline;\n  }\n  sub {\n    bottom: -0.25em;\n  }\n  sup {\n    top: -0.5em;\n  }\n  table {\n    text-indent: 0;\n    border-color: inherit;\n    border-collapse: collapse;\n  }\n  :-moz-focusring {\n    outline: auto;\n  }\n  progress {\n    vertical-align: baseline;\n  }\n  summary {\n    display: list-item;\n  }\n  ol, ul, menu {\n    list-style: none;\n  }\n  img, svg, video, canvas, audio, iframe, embed, object {\n    display: block;\n    vertical-align: middle;\n  }\n  img, video {\n    max-width: 100%;\n    height: auto;\n  }\n  button, input, select, optgroup, textarea, ::file-selector-button {\n    font: inherit;\n    font-feature-settings: inherit;\n    font-variation-settings: inherit;\n    letter-spacing: inherit;\n    color: inherit;\n    border-radius: 0;\n    background-color: transparent;\n    opacity: 1;\n  }\n  :where(select:is([multiple], [size])) optgroup {\n    font-weight: bolder;\n  }\n  :where(select:is([multiple], [size])) optgroup option {\n    padding-inline-start: 20px;\n  }\n  ::file-selector-button {\n    margin-inline-end: 4px;\n  }\n  ::placeholder {\n    opacity: 1;\n    color: currentColor;\n    @supports (color: color-mix(in lab, red, red)) {\n      color: color-mix(in oklab, currentColor 50%, transparent);\n    }\n  }\n  textarea {\n    resize: vertical;\n  }\n  ::-webkit-search-decoration {\n    -webkit-appearance: none;\n  }\n  ::-webkit-date-and-time-value {\n    min-height: 1lh;\n    text-align: inherit;\n  }\n  ::-webkit-datetime-edit {\n    display: inline-flex;\n  }\n  ::-webkit-datetime-edit-fields-wrapper {\n    padding: 0;\n  }\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\n    padding-block: 0;\n  }\n  :-moz-ui-invalid {\n    box-shadow: none;\n  }\n  button, input:where([type=\"button\"], [type=\"reset\"], [type=\"submit\"]), ::file-selector-button {\n    appearance: button;\n  }\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\n    height: auto;\n  }\n  [hidden]:where(:not([hidden=\"until-found\"])) {\n    display: none !important;\n  }\n}\n@layer utilities {\n  .absolute {\n    position: absolute;\n  }\n  .start {\n    inset-inline-start: var(--spacing);\n  }\n  .end {\n    inset-inline-end: var(--spacing);\n  }\n  .flex {\n    display: flex;\n  }\n  .grid {\n    display: grid;\n  }\n  .hidden {\n    display: none;\n  }\n  .transform {\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\n  }\n  .border {\n    border-style: var(--tw-border-style);\n    border-width: 1px;\n  }\n}\n@property --tw-rotate-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-z {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-border-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@layer properties {\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\n    *, ::before, ::after, ::backdrop {\n      --tw-rotate-x: initial;\n      --tw-rotate-y: initial;\n      --tw-rotate-z: initial;\n      --tw-skew-x: initial;\n      --tw-skew-y: initial;\n      --tw-border-style: solid;\n    }\n  }\n}\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n  --bg: #0b0c0f;\n  --bg-1: #0f1115;\n  --bg-2: #14171d;\n  --bg-3: #1a1e26;\n  --line: #23262f;\n  --line-2: #2a2e38;\n  --fg: #e7e9ee;\n  --fg-dim: #a2a7b3;\n  --fg-mute: #6b7280;\n  --fg-faint: #4b5160;\n  --accent: #7c7aff;\n  --accent-weak: #2a2a6a;\n  --accent-glow: rgba(124, 122, 255, 0.18);\n  --warn: #f5a524;\n  --warn-weak: #3a2a10;\n  --danger: #ef4444;\n  --danger-weak: #3a1616;\n  --ok: #22c55e;\n  --ok-weak: #0f2a1a;\n  --info: #38bdf8;\n  --info-weak: #0e2636;\n  --radius: 6px;\n  --radius-lg: 10px;\n  --pad-y: 10px;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nhtml,\nbody {\n  margin: 0;\n  padding: 0;\n  min-height: 100%;\n  background: var(--bg);\n  color: var(--fg);\n  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;\n  font-size: 13px;\n  line-height: 1.4;\n  -webkit-font-smoothing: antialiased;\n  letter-spacing: -0.005em;\n}\n\n.mono {\n  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;\n}\n\n::-webkit-scrollbar {\n  width: 10px;\n  height: 10px;\n}\n\n::-webkit-scrollbar-track {\n  background: var(--bg-1);\n}\n\n::-webkit-scrollbar-thumb {\n  background: var(--line-2);\n  border-radius: 999px;\n  border: 2px solid var(--bg-1);\n}\n\n::selection {\n  background: var(--accent-weak);\n  color: var(--fg);\n}", "",{"version":3,"sources":["webpack://./src/index.css"],"names":[],"mappings":"AAEA;EACE,aAAa;EACb,eAAe;EACf,eAAe;EACf,eAAe;EACf,eAAe;EACf,iBAAiB;EACjB,aAAa;EACb,iBAAiB;EACjB,kBAAkB;EAClB,mBAAmB;EACnB,iBAAiB;EACjB,sBAAsB;EACtB,wCAAwC;EACxC,eAAe;EACf,oBAAoB;EACpB,iBAAiB;EACjB,sBAAsB;EACtB,aAAa;EACb,kBAAkB;EAClB,eAAe;EACf,oBAAoB;EACpB,aAAa;EACb,iBAAiB;EACjB,aAAa;AACf;;AAEA;EACE,sBAAsB;AACxB;;AAEA;;EAEE,SAAS;EACT,UAAU;EACV,gBAAgB;EAChB,qBAAqB;EACrB,gBAAgB;EAChB,iFAAiF;EACjF,eAAe;EACf,gBAAgB;EAChB,mCAAmC;EACnC,wBAAwB;AAC1B;;AAEA;EACE,6DAA6D;AAC/D;;AAEA;EACE,WAAW;EACX,YAAY;AACd;;AAEA;EACE,uBAAuB;AACzB;;AAEA;EACE,yBAAyB;EACzB,oBAAoB;EACpB,6BAA6B;AAC/B;;AAEA;EACE,8BAA8B;EAC9B,gBAAgB;AAClB","sourcesContent":["@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');\n\n:root {\n  --bg: #0b0c0f;\n  --bg-1: #0f1115;\n  --bg-2: #14171d;\n  --bg-3: #1a1e26;\n  --line: #23262f;\n  --line-2: #2a2e38;\n  --fg: #e7e9ee;\n  --fg-dim: #a2a7b3;\n  --fg-mute: #6b7280;\n  --fg-faint: #4b5160;\n  --accent: #7c7aff;\n  --accent-weak: #2a2a6a;\n  --accent-glow: rgba(124, 122, 255, 0.18);\n  --warn: #f5a524;\n  --warn-weak: #3a2a10;\n  --danger: #ef4444;\n  --danger-weak: #3a1616;\n  --ok: #22c55e;\n  --ok-weak: #0f2a1a;\n  --info: #38bdf8;\n  --info-weak: #0e2636;\n  --radius: 6px;\n  --radius-lg: 10px;\n  --pad-y: 10px;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nhtml,\nbody {\n  margin: 0;\n  padding: 0;\n  min-height: 100%;\n  background: var(--bg);\n  color: var(--fg);\n  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;\n  font-size: 13px;\n  line-height: 1.4;\n  -webkit-font-smoothing: antialiased;\n  letter-spacing: -0.005em;\n}\n\n.mono {\n  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;\n}\n\n::-webkit-scrollbar {\n  width: 10px;\n  height: 10px;\n}\n\n::-webkit-scrollbar-track {\n  background: var(--bg-1);\n}\n\n::-webkit-scrollbar-thumb {\n  background: var(--line-2);\n  border-radius: 999px;\n  border: 2px solid var(--bg-1);\n}\n\n::selection {\n  background: var(--accent-weak);\n  color: var(--fg);\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -134,7 +135,7 @@ module.exports = function cssWithMappingToString(item) {
 
 /***/ },
 
-/***/ 9565
+/***/ 7752
 (__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) {
 
 
@@ -189,7 +190,10 @@ var update = injectStylesIntoStyleTag_default()(index_js_src/* default */.A, opt
 
        /* harmony default export */ const src = (index_js_src/* default */.A && index_js_src/* default */.A.locals ? index_js_src/* default */.A.locals : undefined);
 
-;// ./src/Scenes.tsx
+;// ./src/consultflow.png
+const consultflow_namespaceObject = __webpack_require__.p + "c0aea4dfdd6cf95c.png";
+;// ./src/IntroOutro.tsx
+
 
 
 
@@ -199,243 +203,180 @@ const COLORS = {
   "bg-2": "#14171d",
   "bg-3": "#1a1e26",
   line: "#23262f",
-  "line-2": "#2a2e38",
   fg: "#e7e9ee",
   "fg-dim": "#a2a7b3",
   "fg-mute": "#6b7280",
-  "fg-faint": "#4b5160",
   accent: "#7c7aff",
-  "accent-weak": "#2a2a6a",
   accentGlow: "rgba(124, 122, 255, 0.18)",
-  warn: "#f5a524",
-  danger: "#ef4444",
   ok: "#22c55e",
   info: "#38bdf8"
 };
-const TRANSCRIPT_SAMPLE = `Sarah: Hey team, following up on our call. A few things:
-
-Legal has flagged the vendor contract renewal \u2014 we need sign-off from procurement before we can proceed. Targeting end of next week but this is at risk.
-
-Marcus: Thanks for the update. Can someone own the competitive benchmarking deck? We promised the board a first draft by May 2.
-
-Sarah: I'm waiting on Marcus to confirm the go-live date for the APAC rollout. He was supposed to revert by yesterday.`;
-const SAMPLE_CARDS = [
-  { id: "ACM-101", title: "Competitive benchmarking deck", kind: "task", status: "todo", owner: "JS", ownerName: "John Smith" },
-  { id: "ACM-102", title: "Vendor contract sign-off", kind: "blocker", status: "todo", owner: "Legal", ownerName: "Legal team" },
-  { id: "ACM-103", title: "Go-live date confirmation", kind: "waiting", status: "waiting", owner: "MC", ownerName: "Marcus Chen" },
-  { id: "ACM-104", title: "Pricing model rework", kind: "risk", status: "doing", owner: "JS", ownerName: "John Smith", due: "May 5" }
+const GmailIcon = () => /* @__PURE__ */ (0,jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "56", height: "56", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
+  /* @__PURE__ */ (0,jsx_runtime.jsx)("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2", fill: "#EA4335" }),
+  /* @__PURE__ */ (0,jsx_runtime.jsx)("path", { d: "M2 7l10 7.5L22 7", stroke: "white", strokeWidth: "2" })
+] });
+const ZoomIcon = () => /* @__PURE__ */ (0,jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "56", height: "56", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
+  /* @__PURE__ */ (0,jsx_runtime.jsx)("rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", fill: "#2D8CFF" }),
+  /* @__PURE__ */ (0,jsx_runtime.jsx)("circle", { cx: "12", cy: "12", r: "4", fill: "white" })
+] });
+const TextIcon = () => /* @__PURE__ */ (0,jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "56", height: "56", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
+  /* @__PURE__ */ (0,jsx_runtime.jsx)("rect", { x: "3", y: "2", width: "18", height: "20", rx: "2", fill: "#7c7aff" }),
+  /* @__PURE__ */ (0,jsx_runtime.jsx)("path", { d: "M7 8h10M7 12h8M7 16h6", stroke: "white", strokeWidth: "2", strokeLinecap: "round" })
+] });
+const AgentIcon = ({ name }) => {
+  const colors = {
+    Extractor: COLORS.info,
+    Execution: COLORS.accent,
+    Email: COLORS.ok
+  };
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("svg", { viewBox: "0 0 64 64", width: "72", height: "72", children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("circle", { cx: "32", cy: "32", r: "28", fill: colors[name], fillOpacity: "0.2", stroke: colors[name], strokeWidth: "3" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("text", { x: "32", y: "40", textAnchor: "middle", fill: colors[name], fontSize: "28", fontWeight: "bold", children: name[0] })
+  ] });
+};
+const FEATURES = [
+  "AI extracts commitments from calls & emails",
+  "Auto-organizes into Kanban board",
+  "Executive summaries in one click",
+  "Automated action memos & follow-ups"
 ];
-const SUMMARY_TEXT = `Executive Summary
-
-As of Q3 2026, ACM Corp engagement is progressing with 4 active commitments, 2 blockers requiring escalation, and 1 identified risk to timeline.
-
-Client-gating items: Vendor contract renewal pending procurement sign-off (at risk for May 15 deadline). Go-live date confirmation overdue from Marcus Chen.
-
-Next Steps: Escalate vendor contract to procurement lead. Follow up on APAC go-live date. Complete competitive benchmarking deck for board presentation.`;
-const sceneDuration = (start, end) => ({
-  inStart: start,
-  inEnd: end,
-  duration: end - start
-});
+const AGENTS = [
+  { name: "Extractor", icon: /* @__PURE__ */ (0,jsx_runtime.jsx)(AgentIcon, { name: "Extractor" }), desc: "Parse calls & emails" },
+  { name: "Execution", icon: /* @__PURE__ */ (0,jsx_runtime.jsx)(AgentIcon, { name: "Execution" }), desc: "Summarize & plan" },
+  { name: "Email", icon: /* @__PURE__ */ (0,jsx_runtime.jsx)(AgentIcon, { name: "Email" }), desc: "Send digests" }
+];
+const SOURCES = [
+  { name: "Gmail", icon: /* @__PURE__ */ (0,jsx_runtime.jsx)(GmailIcon, {}), color: "#EA4335" },
+  { name: "Zoom", icon: /* @__PURE__ */ (0,jsx_runtime.jsx)(ZoomIcon, {}), color: "#2D8CFF" },
+  { name: "Text", icon: /* @__PURE__ */ (0,jsx_runtime.jsx)(TextIcon, {}), color: COLORS.accent }
+];
 const SCENES = {
-  hook: sceneDuration(0, 300),
-  problem: sceneDuration(300, 750),
-  solution: sceneDuration(750, 1200),
-  source: sceneDuration(1200, 1650),
-  board: sceneDuration(1650, 2250),
-  summary: sceneDuration(2250, 2850),
-  actions: sceneDuration(2850, 3300),
-  closing: sceneDuration(3300, 3600)
+  intro: { start: 0, end: 270 },
+  pills: { start: 270, end: 510 },
+  sources: { start: 480, end: 720 },
+  agents: { start: 690, end: 930 },
+  outro: { start: 900, end: 1050 }
 };
-const totalFrames = 3600;
-const Scene1_Hook = () => {
+const totalFrames = 1050;
+const Intro = () => {
   const f = (0,esm.useCurrentFrame)();
-  const o = (0,esm.interpolate)(f, [0, 30, 240, 300], [0, 1, 1, 0], { extrapolateClamp: true });
-  const s = (0,esm.interpolate)(f, [0, 60], [0.9, 1], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center", opacity: o, transform: `scale(${s})`, transformOrigin: "center" }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 72, fontWeight: 700, color: COLORS.fg, letterSpacing: "-0.02em" }, children: "ConsultFlow" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 28, color: COLORS["fg-dim"], marginTop: 20 }, children: "AI Consulting Workflow Automation" })
+  const inRange = f >= SCENES.intro.start && f < SCENES.intro.end;
+  if (!inRange) return null;
+  const localF = f - SCENES.intro.start;
+  const mainFade = (0,esm.interpolate)(localF, [0, 30, 240, 270], [0, 1, 1, 0], { extrapolateClamp: true });
+  const subFade = (0,esm.interpolate)(localF, [30, 70], [0, 1], { extrapolateClamp: true });
+  const headline = (0,esm.interpolate)(localF, [80, 120], [0, 1], { extrapolateClamp: true });
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center", opacity: mainFade }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: consultflow_namespaceObject, style: { width: 500, height: "auto" } }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 36, color: COLORS["fg-dim"], marginTop: 32, opacity: subFade, fontFamily: "Space Grotesk, sans-serif" }, children: "AI-Powered Consulting Workflow" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { marginTop: 64, opacity: headline }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 28, color: COLORS["fg-mute"], marginBottom: 16 }, children: "Turn messy client interactions into" }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 44, color: COLORS.accent, fontWeight: 700 }, children: "organized action, instantly" })
+    ] })
   ] }) });
 };
-const Scene2_Problem = () => {
+const PillsSlide = () => {
   const f = (0,esm.useCurrentFrame)();
-  const t1 = (0,esm.interpolate)(f, [30, 90], [0, 1], { extrapolateClamp: true });
-  const t2 = (0,esm.interpolate)(f, [90, 150], [0, 1], { extrapolateClamp: true });
-  const t3 = (0,esm.interpolate)(f, [150, 210], [0, 1], { extrapolateClamp: true });
-  const t4 = (0,esm.interpolate)(f, [210, 270], [0, 1], { extrapolateClamp: true });
-  const fo = (0,esm.interpolate)(f, [420, 450], [1, 0], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, padding: 80, opacity: fo }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: 28 }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 28, color: COLORS["fg-dim"], opacity: t1 }, children: "Every consultant's nightmare:" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 52, fontWeight: 600, color: COLORS.fg, opacity: t2 }, children: '"20+ client emails to parse"' }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 52, fontWeight: 600, color: COLORS.danger, opacity: t3 }, children: '"Lost commitments = Lost trust"' }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 52, fontWeight: 600, color: COLORS["fg-mute"], opacity: t4 }, children: '"Manual tracking = No time for actual work"' })
+  const inRange = f >= SCENES.pills.start && f < SCENES.pills.end;
+  if (!inRange) return null;
+  const localF = f - SCENES.pills.start;
+  const mainFade = (0,esm.interpolate)(localF, [0, 30, 210, 240], [0, 1, 1, 0], { extrapolateClamp: true });
+  const pill1 = (0,esm.interpolate)(localF, [30, 70], [0, 1], { extrapolateClamp: true });
+  const pill2 = (0,esm.interpolate)(localF, [50, 90], [0, 1], { extrapolateClamp: true });
+  const pill3 = (0,esm.interpolate)(localF, [70, 110], [0, 1], { extrapolateClamp: true });
+  const pill4 = (0,esm.interpolate)(localF, [90, 130], [0, 1], { extrapolateClamp: true });
+  const desc = (0,esm.interpolate)(localF, [120, 160], [0, 1], { extrapolateClamp: true });
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center", opacity: mainFade }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 32, color: COLORS["fg-mute"], marginBottom: 48 }, children: "Everything you need to stay on top of client work" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", flexDirection: "column", gap: 24, maxWidth: 900, alignItems: "center" }, children: FEATURES.map((feat, i) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { padding: "24px 40px", borderRadius: 20, fontSize: 22, color: COLORS.fg, backgroundColor: COLORS["bg-2"], border: `1px solid ${COLORS.line}`, opacity: [pill1, pill2, pill3, pill4][i], width: 700, textAlign: "left", display: "flex", alignItems: "center", gap: 20 }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: 40, height: 40, borderRadius: "50%", backgroundColor: COLORS.accent, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "24", height: "24", fill: "none", stroke: "white", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0,jsx_runtime.jsx)("polyline", { points: "20 6 9 17 4 12" }) }) }),
+      feat
+    ] }, feat)) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 24, color: COLORS.accent, marginTop: 48, opacity: desc }, children: "All of this, powered by AI" })
   ] }) });
 };
-const Scene3_SolutionIntro = () => {
+const SourcesSlide = () => {
   const f = (0,esm.useCurrentFrame)();
-  const meet = (0,esm.interpolate)(f, [30, 90], [0, 1], { extrapolateClamp: true });
-  const title = (0,esm.interpolate)(f, [90, 150], [0, 1], { extrapolateClamp: true });
-  const sub = (0,esm.interpolate)(f, [150, 210], [0, 1], { extrapolateClamp: true });
-  const fo = (0,esm.interpolate)(f, [420, 450], [1, 0], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: fo }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 28, color: COLORS["fg-mute"], opacity: meet }, children: "Meet" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 84, fontWeight: 700, color: COLORS.accent, letterSpacing: "-0.02em", opacity: title, textShadow: `0 0 80px ${COLORS.accentGlow}` }, children: "ConsultFlow" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 28, color: COLORS["fg-dim"], marginTop: 20, opacity: sub }, children: "AI-powered consulting workflow automation" })
-  ] }) });
-};
-const Scene4_SourceIngestion = () => {
-  const f = (0,esm.useCurrentFrame)();
-  const panel = (0,esm.interpolate)(f, [30, 90], [0, 1], { extrapolateClamp: true });
-  const tabs = (0,esm.interpolate)(f, [60, 120], [0, 1], { extrapolateClamp: true });
-  const content = (0,esm.interpolate)(f, [90, 150], [0, 1], { extrapolateClamp: true });
-  const button = (0,esm.interpolate)(f, [150, 210], [0, 1], { extrapolateClamp: true });
-  const loading = (0,esm.interpolate)(f, [210, 330], [0, 1], { extrapolateClamp: true });
-  const fo = (0,esm.interpolate)(f, [420, 450], [1, 0], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, opacity: fo }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { width: "33%", height: "100%", backgroundColor: COLORS["bg-1"], borderRight: `1px solid ${COLORS.line}`, padding: 20, opacity: panel }, children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 14, fontWeight: 600, color: COLORS.fg, marginBottom: 12 }, children: "Source" }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", gap: 8, marginBottom: 16 }, children: ["Transcript", "Email", "Notes"].map((tab, i) => /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { padding: "8px 14px", borderRadius: 6, fontSize: 12, color: i === 0 ? COLORS.fg : COLORS["fg-dim"], backgroundColor: i === 0 ? COLORS["bg-3"] : "transparent", border: i === 0 ? `1px solid ${COLORS["line-2"]}` : `1px solid ${COLORS.line}` }, children: tab }, tab)) }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { backgroundColor: COLORS["bg-2"], borderRadius: 8, padding: 16, height: 300, fontSize: 11, color: COLORS["fg-dim"], fontFamily: "monospace", opacity: content, lineHeight: 1.5 }, children: TRANSCRIPT_SAMPLE }),
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", gap: 12, marginTop: 16, opacity: button }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { padding: "10px 20px", borderRadius: 6, fontSize: 12, color: COLORS["fg-dim"], border: `1px solid ${COLORS.line}` }, children: "Clear" }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { padding: "10px 20px", borderRadius: 6, fontSize: 12, color: "#fff", backgroundColor: COLORS.accent, fontWeight: 500 }, children: "Re-parse" })
+  const inRange = f >= SCENES.sources.start && f < SCENES.sources.end;
+  if (!inRange) return null;
+  const localF = f - SCENES.sources.start;
+  const mainFade = (0,esm.interpolate)(localF, [0, 30, 210, 240], [0, 1, 1, 0], { extrapolateClamp: true });
+  const title = (0,esm.interpolate)(localF, [20, 60], [0, 1], { extrapolateClamp: true });
+  const src1 = (0,esm.interpolate)(localF, [50, 90], [0, 1], { extrapolateClamp: true });
+  const src2 = (0,esm.interpolate)(localF, [70, 110], [0, 1], { extrapolateClamp: true });
+  const src3 = (0,esm.interpolate)(localF, [90, 130], [0, 1], { extrapolateClamp: true });
+  const bar = (0,esm.interpolate)(localF, [110, 150], [0, 1], { extrapolateClamp: true });
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: mainFade }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 36, color: COLORS["fg-mute"], marginBottom: 56, opacity: title }, children: "Connect your data from anywhere" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", gap: 32, justifyContent: "center", marginBottom: 56 }, children: SOURCES.map((src, i) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { width: 160, height: 160, borderRadius: 28, backgroundColor: COLORS["bg-2"], border: `2px solid ${src.color}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", opacity: [src1, src2, src3][i] }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { marginBottom: 12 }, children: src.icon }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 20, color: COLORS.fg, fontWeight: 600 }, children: src.name })
+    ] }, src.name)) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 24, padding: "20px 40px", backgroundColor: COLORS["bg-1"], borderRadius: 20, border: `1px solid ${COLORS.line}`, opacity: bar }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, color: COLORS["fg-mute"] }, children: "\u2192" }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 24, color: COLORS.fg, fontWeight: 700 }, children: "AI Processing" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 18, color: COLORS["fg-dim"] }, children: "Extracts commitments, blockers, risks" })
+      ] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, color: COLORS["fg-mute"] }, children: "\u2192" }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 24, color: COLORS.accent, fontWeight: 700 }, children: "ConsultFlow" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 18, color: COLORS["fg-dim"] }, children: "Organized dashboard" })
       ] })
     ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { flex: 1, display: "flex", justifyContent: "center", alignItems: "center", opacity: loading }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { backgroundColor: COLORS["bg-2"], borderRadius: 12, padding: "24px 32px", border: `1px solid ${COLORS.line}`, minWidth: 340 }, children: [
-      { text: "Segmenting by speaker", done: true },
-      { text: "Identifying commitments & owners", done: true },
-      { text: "Classifying blockers, risks, waiting", done: true },
-      { text: "Linking to source quotes", done: false }
-    ].map((step, i) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 14, padding: "10px 0", color: step.done ? COLORS.ok : i === 3 ? COLORS.fg : COLORS["fg-dim"], fontSize: 14 }, children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: 22, height: 22, borderRadius: "50%", backgroundColor: step.done ? COLORS.ok : "transparent", border: `1px solid ${step.done ? COLORS.ok : COLORS.line}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#fff" }, children: step.done ? "\u2713" : "" }),
-      step.text
-    ] }, step.text)) }) })
-  ] });
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 22, color: COLORS["fg-mute"], marginTop: 56, opacity: bar }, children: "Gmail \u2022 Zoom \u2022 Slack \u2022 Teams \u2022 Text \u2022 More coming soon" })
+  ] }) });
 };
-const Scene5_Kanban = () => {
+const AgentsSlide = () => {
   const f = (0,esm.useCurrentFrame)();
-  const col1 = (0,esm.interpolate)(f, [30, 90], [0, 1], { extrapolateClamp: true });
-  const col2 = (0,esm.interpolate)(f, [90, 150], [0, 1], { extrapolateClamp: true });
-  const col3 = (0,esm.interpolate)(f, [150, 210], [0, 1], { extrapolateClamp: true });
-  const col4 = (0,esm.interpolate)(f, [210, 270], [0, 1], { extrapolateClamp: true });
-  const fo = (0,esm.interpolate)(f, [570, 600], [1, 0], { extrapolateClamp: true });
-  const columns = [
-    { key: "todo", label: "Todo", color: COLORS["fg-dim"], count: 2, status: "todo" },
-    { key: "doing", label: "In progress", color: COLORS.info, count: 1, status: "doing" },
-    { key: "waiting", label: "Waiting on client", color: COLORS.warn, count: 1, status: "waiting" },
-    { key: "done", label: "Done", color: COLORS.ok, count: 0, status: "done" }
-  ];
-  const cardEntry = (delay) => (0,esm.interpolate)(f, [delay, delay + 30], [0, 1], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, padding: 32, opacity: fo }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", gap: 16, height: "100%" }, children: columns.map((col, colIdx) => {
-    const cards = SAMPLE_CARDS.filter((c) => c.status === col.status);
-    const op = [col1, col2, col3, col4][colIdx];
-    return /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { flex: 1, backgroundColor: COLORS["bg-1"], borderRadius: 12, border: `1px solid ${COLORS.line}`, overflow: "hidden", opacity: op }, children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { padding: "14px 18px", borderBottom: `1px solid ${COLORS.line}`, display: "flex", alignItems: "center", gap: 10 }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: 10, height: 10, borderRadius: "50%", backgroundColor: col.color } }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { fontSize: 13, fontWeight: 500, color: COLORS.fg }, children: col.label }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { fontSize: 12, color: COLORS["fg-mute"] }, children: col.count })
-      ] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { padding: 14, display: "flex", flexDirection: "column", gap: 10 }, children: cards.map((card, i) => {
-        const cardOp = (0,esm.interpolate)(f, [60 + colIdx * 40 + i * 30, 60 + colIdx * 40 + i * 30 + 30], [0, 1], { extrapolateClamp: true });
-        const cardY = (0,esm.interpolate)(f, [60 + colIdx * 40 + i * 30, 60 + colIdx * 40 + i * 30 + 30], [20, 0], { extrapolateClamp: true });
-        const kindColors = { task: COLORS.accent, blocker: COLORS.danger, risk: COLORS.warn, waiting: COLORS.info };
-        return /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { backgroundColor: COLORS["bg-2"], borderRadius: 8, padding: 14, border: `1px solid ${COLORS.line}`, opacity: cardOp, transform: `translateY(${cardY}px)` }, children: [
-          /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 10 }, children: [
-            /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { fontSize: 10, color: COLORS["fg-mute"], fontFamily: "monospace" }, children: card.id }),
-            /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { fontSize: 9, padding: "3px 8px", borderRadius: 4, backgroundColor: kindColors[card.kind] + "25", color: kindColors[card.kind], fontWeight: 500 }, children: card.kind })
-          ] }),
-          /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 12, color: COLORS.fg, marginBottom: 10, lineHeight: 1.4 }, children: card.title }),
-          /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
-            /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: 22, height: 22, borderRadius: "50%", backgroundColor: COLORS.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600, color: "#fff" }, children: card.owner }),
-            /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { fontSize: 11, color: COLORS["fg-dim"] }, children: card.ownerName })
-          ] })
-        ] }, card.id);
-      }) })
-    ] }, col.key);
-  }) }) });
+  const inRange = f >= SCENES.agents.start && f < SCENES.agents.end;
+  if (!inRange) return null;
+  const localF = f - SCENES.agents.start;
+  const mainFade = (0,esm.interpolate)(localF, [0, 30, 210, 240], [0, 1, 1, 0], { extrapolateClamp: true });
+  const title = (0,esm.interpolate)(localF, [20, 60], [0, 1], { extrapolateClamp: true });
+  const agent1 = (0,esm.interpolate)(localF, [60, 100], [0, 1], { extrapolateClamp: true });
+  const agent2 = (0,esm.interpolate)(localF, [80, 120], [0, 1], { extrapolateClamp: true });
+  const agent3 = (0,esm.interpolate)(localF, [100, 140], [0, 1], { extrapolateClamp: true });
+  const connect = (0,esm.interpolate)(localF, [140, 180], [0, 1], { extrapolateClamp: true });
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: mainFade }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 36, color: COLORS["fg-mute"], marginBottom: 56, opacity: title }, children: "Powered by Claude Managed Agents" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", gap: 32, justifyContent: "center", marginBottom: 56 }, children: AGENTS.map((agent, i) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { width: 240, padding: "32px 24px", borderRadius: 28, backgroundColor: COLORS["bg-2"], border: `2px solid ${i === 0 ? COLORS.info : i === 1 ? COLORS.accent : COLORS.ok}`, display: "flex", flexDirection: "column", alignItems: "center", opacity: [agent1, agent2, agent3][i] }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { marginBottom: 20, transform: "scale(1.4)" }, children: agent.icon }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 26, color: COLORS.fg, fontWeight: 700, marginBottom: 10 }, children: agent.name }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 18, color: COLORS["fg-dim"] }, children: agent.desc })
+    ] }, agent.name)) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", alignItems: "center", gap: 20, padding: "20px 40px", backgroundColor: COLORS["bg-1"], borderRadius: 20, border: `2px solid ${COLORS.accent}`, opacity: connect }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 16, color: COLORS["fg-mute"] }, children: "Each agent is a specialized Claude instance that runs autonomously" }) })
+  ] }) });
 };
-const Scene6_Summary = () => {
+const Outro = () => {
   const f = (0,esm.useCurrentFrame)();
-  const panel = (0,esm.interpolate)(f, [30, 90], [0, 1], { extrapolateClamp: true });
-  const stats = (0,esm.interpolate)(f, [90, 150], [0, 1], { extrapolateClamp: true });
-  const bar = (0,esm.interpolate)(f, [150, 210], [0, 1], { extrapolateClamp: true });
-  const content = (0,esm.interpolate)(f, [210, 270], [0, 1], { extrapolateClamp: true });
-  const button = (0,esm.interpolate)(f, [270, 330], [0, 1], { extrapolateClamp: true });
-  const fo = (0,esm.interpolate)(f, [570, 600], [1, 0], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, opacity: fo }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { flex: 1 } }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { position: "absolute", right: 0, top: 0, bottom: 0, width: 320, backgroundColor: COLORS["bg-1"], borderLeft: `1px solid ${COLORS.line}`, padding: 24, opacity: panel }, children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 18, fontWeight: 600, color: COLORS.fg, marginBottom: 20 }, children: "Executive Summary" }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20, opacity: stats }, children: [
-        { label: "Action items", value: "4", color: COLORS.accent },
-        { label: "Waiting", value: "2", color: COLORS.warn },
-        { label: "Blockers", value: "2", color: COLORS.danger },
-        { label: "Risks", value: "1", color: COLORS.info }
-      ].map((stat) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { backgroundColor: COLORS["bg-2"], borderRadius: 10, padding: 14, textAlign: "center" }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 24, fontWeight: 600, color: stat.color }, children: stat.value }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 11, color: COLORS["fg-mute"], marginTop: 4 }, children: stat.label })
-      ] }, stat.label)) }),
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { height: 8, backgroundColor: COLORS["bg-3"], borderRadius: 4, overflow: "hidden", marginBottom: 20, opacity: bar }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: "40%", height: "100%", backgroundColor: COLORS.ok, float: "left" } }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: "25%", height: "100%", backgroundColor: COLORS.info, float: "left" } }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: "20%", height: "100%", backgroundColor: COLORS.warn, float: "left" } }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: "15%", height: "100%", backgroundColor: COLORS["fg-mute"], float: "left" } })
+  const inRange = f >= SCENES.outro.start && f < SCENES.outro.end;
+  if (!inRange) return null;
+  const localF = f - SCENES.outro.start;
+  const mainFade = (0,esm.interpolate)(localF, [0, 30, 120, 150], [0, 1, 1, 0], { extrapolateClamp: true });
+  const subtitle = (0,esm.interpolate)(localF, [20, 60], [0, 1], { extrapolateClamp: true });
+  const cta = (0,esm.interpolate)(localF, [80, 120], [0, 1], { extrapolateClamp: true });
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center", opacity: mainFade }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 32, color: COLORS["fg-mute"], opacity: subtitle }, children: "From chaos to clarity" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: consultflow_namespaceObject, style: { width: 450, height: "auto", marginTop: 32 } }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 56, fontWeight: 700, color: COLORS.accent, marginTop: 48, opacity: cta }, children: "Stop tracking." }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 56, fontWeight: 700, color: COLORS.accent, opacity: cta }, children: "Start consulting." }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", gap: 40, justifyContent: "center", marginTop: 72 }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, fontWeight: 700, color: COLORS.ok }, children: "80%" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 16, color: COLORS["fg-mute"] }, children: "less manual work" })
       ] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { backgroundColor: COLORS["bg-2"], borderRadius: 10, padding: 16, fontSize: 11, color: COLORS["fg-dim"], lineHeight: 1.6, opacity: content }, children: SUMMARY_TEXT }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { marginTop: 24, padding: "12px 20px", borderRadius: 8, fontSize: 13, fontWeight: 500, color: "#fff", backgroundColor: COLORS.accent, textAlign: "center", opacity: button }, children: "Generate digest" })
-    ] })
-  ] });
-};
-const Scene7_AutoActions = () => {
-  const f = (0,esm.useCurrentFrame)();
-  const panel = (0,esm.interpolate)(f, [30, 90], [0, 1], { extrapolateClamp: true });
-  const header = (0,esm.interpolate)(f, [90, 150], [0, 1], { extrapolateClamp: true });
-  const status = (0,esm.interpolate)(f, [150, 210], [0, 1], { extrapolateClamp: true });
-  const actions = (0,esm.interpolate)(f, [210, 270], [0, 1], { extrapolateClamp: true });
-  const result = (0,esm.interpolate)(f, [270, 330], [0, 1], { extrapolateClamp: true });
-  const fo = (0,esm.interpolate)(f, [420, 450], [1, 0], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, opacity: fo }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { flex: 1 } }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { position: "absolute", right: 0, top: 0, bottom: 0, width: 320, backgroundColor: COLORS["bg-1"], borderLeft: `1px solid ${COLORS.line}`, padding: 24, opacity: panel }, children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, opacity: header }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 14, fontWeight: 600, color: COLORS.fg }, children: "ACM-102" }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { fontSize: 10, padding: "4px 10px", borderRadius: 4, backgroundColor: COLORS.danger + "25", color: COLORS.danger, fontWeight: 500 }, children: "blocker" })
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: 2, backgroundColor: COLORS.line } }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, fontWeight: 700, color: COLORS.info }, children: "10x" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 16, color: COLORS["fg-mute"] }, children: "faster follow-ups" })
       ] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 18, fontWeight: 500, color: COLORS.fg, marginBottom: 20 }, children: "Vendor contract sign-off" }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { display: "flex", gap: 6, padding: 6, backgroundColor: COLORS["bg-2"], borderRadius: 10, marginBottom: 20, opacity: status }, children: ["Todo", "In progress", "Waiting", "Done"].map((s, i) => /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { flex: 1, padding: "8px 6px", borderRadius: 8, fontSize: 10, textAlign: "center", color: i === 1 ? COLORS.fg : COLORS["fg-dim"], backgroundColor: i === 1 ? COLORS["bg-3"] : "transparent", border: i === 1 ? `1px solid ${COLORS["line-2"]}` : "transparent" }, children: s }, s)) }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 13, fontWeight: 500, color: COLORS.fg, marginBottom: 14, opacity: actions }, children: "Automated actions" }),
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: 10, opacity: actions }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { padding: "14px 16px", borderRadius: 10, fontSize: 12, color: COLORS["fg-dim"], border: `1px solid ${COLORS.line}`, backgroundColor: COLORS["bg-2"] }, children: "Write escalation note" }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { padding: "14px 16px", borderRadius: 10, fontSize: 12, color: COLORS["fg-dim"], border: `1px solid ${COLORS.line}`, backgroundColor: COLORS["bg-2"] }, children: "Draft memo to legal" })
-      ] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { marginTop: 20, padding: 16, borderRadius: 10, border: `1px solid ${COLORS.line}`, backgroundColor: COLORS["bg-1"], opacity: result }, children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 10 }, children: [
-          /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { fontSize: 10, color: COLORS.accent, fontWeight: 500 }, children: "escalation_note" }),
-          /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { fontSize: 10, color: COLORS["fg-mute"] }, children: "Copy" })
-        ] }),
-        /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { fontSize: 11, color: COLORS["fg-dim"], fontFamily: "monospace", lineHeight: 1.5 }, children: [
-          "To: Sarah Chen, VP Operations",
-          /* @__PURE__ */ (0,jsx_runtime.jsx)("br", {}),
-          "Re: Vendor contract renewal at risk",
-          /* @__PURE__ */ (0,jsx_runtime.jsx)("br", {}),
-          /* @__PURE__ */ (0,jsx_runtime.jsx)("br", {}),
-          "The vendor contract renewal is at risk due to delayed procurement sign-off..."
-        ] })
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: 2, backgroundColor: COLORS.line } }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 40, fontWeight: 700, color: COLORS.accent }, children: "100%" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 16, color: COLORS["fg-mute"] }, children: "client visibility" })
       ] })
     ] })
-  ] });
-};
-const Scene8_Closing = () => {
-  const f = (0,esm.useCurrentFrame)();
-  const sub = (0,esm.interpolate)(f, [30, 90], [0, 1], { extrapolateClamp: true });
-  const title = (0,esm.interpolate)(f, [90, 150], [0, 1], { extrapolateClamp: true });
-  const cta = (0,esm.interpolate)(f, [150, 210], [0, 1], { extrapolateClamp: true });
-  const fade = (0,esm.interpolate)(f, [270, 300], [1, 0], { extrapolateClamp: true });
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: COLORS.bg, justifyContent: "center", alignItems: "center", opacity: fade }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { textAlign: "center" }, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 28, color: COLORS["fg-mute"], opacity: sub }, children: "From chaos to clarity" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 72, fontWeight: 700, color: COLORS.fg, letterSpacing: "-0.02em", marginTop: 20, opacity: title }, children: "ConsultFlow" }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 52, fontWeight: 700, color: COLORS.accent, marginTop: 28, opacity: cta }, children: "Stop tracking." }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { fontSize: 52, fontWeight: 700, color: COLORS.accent, opacity: cta }, children: "Start consulting." })
   ] }) });
 };
 
@@ -448,14 +389,11 @@ const Scene8_Closing = () => {
 function VideoTimeline() {
   const frame = (0,esm.useCurrentFrame)();
   return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { children: [
-    frame >= 0 && frame < 300 && /* @__PURE__ */ (0,jsx_runtime.jsx)(Scene1_Hook, {}),
-    frame >= 300 && frame < 750 && /* @__PURE__ */ (0,jsx_runtime.jsx)(Scene2_Problem, {}),
-    frame >= 750 && frame < 1200 && /* @__PURE__ */ (0,jsx_runtime.jsx)(Scene3_SolutionIntro, {}),
-    frame >= 1200 && frame < 1650 && /* @__PURE__ */ (0,jsx_runtime.jsx)(Scene4_SourceIngestion, {}),
-    frame >= 1650 && frame < 2250 && /* @__PURE__ */ (0,jsx_runtime.jsx)(Scene5_Kanban, {}),
-    frame >= 2250 && frame < 2850 && /* @__PURE__ */ (0,jsx_runtime.jsx)(Scene6_Summary, {}),
-    frame >= 2850 && frame < 3300 && /* @__PURE__ */ (0,jsx_runtime.jsx)(Scene7_AutoActions, {}),
-    frame >= 3300 && frame < 3600 && /* @__PURE__ */ (0,jsx_runtime.jsx)(Scene8_Closing, {})
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(Intro, {}),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(PillsSlide, {}),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(SourcesSlide, {}),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(AgentsSlide, {}),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(Outro, {})
   ] });
 }
 const RemotionVideo = () => {
@@ -28680,7 +28618,7 @@ var NoReactInternals = {
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	__webpack_require__(6507);
-/******/ 	__webpack_require__(9565);
+/******/ 	__webpack_require__(7752);
 /******/ 	__webpack_require__(3610);
 /******/ 	var __webpack_exports__ = __webpack_require__(3482);
 /******/ 	
