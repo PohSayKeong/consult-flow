@@ -334,5 +334,83 @@
       "files": ["web/app/page.tsx", "web/components/RightPanel.tsx"],
       "updated_at": "2026-04-24T16:18:00+0800"
     }
+  ,
+    {
+      "id": "TASK-030",
+      "title": "Pre-populate board with mock items and merge on re-parse",
+      "description": "Two related changes to web/app/page.tsx:\n\n1. Pre-populate on load: change initial items state from `[]` to `MOCK_ITEMS` (imported from web/lib/mocks.ts), and initial stats from `emptyStats` to `MOCK_STATS`. The board should show cards immediately when the page loads — no parse required to see the initial state.\n\n2. Merge on re-parse (not replace): when extraction returns new items, merge them into the existing list rather than replacing it. Merge strategy: for each returned item, if an item with the same id already exists in the current list → update it in place; if the id is new → append it. This lets users parse multiple sources (Transcript, Email, Notes) and accumulate items on the board across parses.\n\n   Implementation hint: `setItems(current => { const map = new Map(current.map(i => [i.id, i])); for (const item of payload.items) { map.set(item.id, item); } return Array.from(map.values()); })`\n\n3. Recompute stats from the merged list, not just from payload.stats. Stats = { total: merged.length, waiting: ..., blockers: ..., risks: ... }.\n\n4. digestIds should survive a re-parse — don't reset digestIds to [] on each parse. Keep the existing digest curation across source switches.",
+      "stage": "ingest",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-027", "TASK-029"],
+      "output": "Prepopulated the board on load with a small set of seed items that are distinct from the preloaded source text (so parsing adds/merges new items instead of duplicating). Updated extraction handling to merge parsed items into the existing list, recompute stats from the merged list, and preserve digestIds across re-parses.",
+      "files": ["web/app/page.tsx"],
+      "updated_at": "2026-04-24T16:45:00+0800"
+    }
+  ,
+    {
+      "id": "TASK-031",
+      "title": "Collapsible source panel with add-source reveal button",
+      "description": "Make the source (InputPanel) panel hideable so users can focus on the board after parsing, while keeping an easy way to bring it back.\n\n## State\nAdd `sourcePanelOpen: boolean` state in page.tsx (default true).\n\n## Layout\nThe workspace grid is currently `grid-cols-[360px_1fr_300px]`. When sourcePanelOpen is false, collapse the first column: use a CSS variable `--source-w` (360px when open, 0px when closed) and add `overflow-hidden` + `transition-[width] duration-200` on the left column wrapper div so it animates shut.\n\nAlternatively, use a conditional className that adds `hidden` when closed — but the CSS variable approach with transition looks smoother.\n\n## Toggle button in InputPanel header\nAdd a `onToggle?: () => void` prop to InputPanel. In the panel header row (the row with the 'Source' h2), add a small icon button on the right side that triggers onToggle. Use a simple × (close) SVG or a chevron-left inline SVG — no icon library.\n\nWhen the panel is closed, the button is gone (since the panel is hidden). Instead, add a persistent 'Add source' button in the topbar (the 44px bar with breadcrumbs) at the left side, visible only when sourcePanelOpen is false. Clicking it sets sourcePanelOpen back to true.\n\nThe 'Add source' button should look like a small outlined pill: `border border-line bg-bg-2 px-2.5 py-1 text-xs text-fg-dim rounded-md hover:border-line-2 hover:text-fg`.\n\n## Pass-through\nPass `onToggle={() => setSourcePanelOpen(false)}` from page.tsx to InputPanel.",
+      "stage": "ingest",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-002", "TASK-019", "TASK-030"],
+      "output": "Added a hideable/collapsible source panel controlled by page state, with an inline close button in the InputPanel header and an 'Add source' pill in the topbar that appears when the panel is hidden.",
+      "files": ["web/app/page.tsx", "web/components/InputPanel.tsx"],
+      "updated_at": "2026-04-24T16:45:00+0800"
+    }
+  ,
+    {
+      "id": "TASK-032",
+      "title": "Wire + button in Board columns to add a new item inline",
+      "description": "The + span in each column header (Board.tsx line 129) is currently a static decoration. Make it functional.\n\n## Behaviour\nClicking + on a column header opens a compact inline form at the top of that column's card list. The form has:\n- A single text input (autofocused): placeholder 'Item title…'\n- Pressing Enter submits (if input is non-empty)\n- Pressing Escape cancels\n- A small 'Add' button and an × cancel button next to the input\n\nOn submit, call an `onAddItem(status: ItemStatus, title: string) => void` prop passed from page.tsx.\n\n## State (Board.tsx)\nAdd local state `addingToColumn: ConsultItem['status'] | null` (default null). When + is clicked, set it to the column key. When the form submits or cancels, reset to null.\n\n## New item object (page.tsx)\nIn `handleAddItem(status, title)`, create a new ConsultItem:\n```typescript\n{\n  id: `MAN-${Date.now()}`,\n  title,\n  kind: status === 'waiting' ? 'waiting' : 'task',\n  status,\n  owner: 'ME',\n  ownerName: 'Me',\n  due: '',\n  dueFlag: null,\n  tags: ['manual'],\n  waiting: status === 'waiting',\n  quote: null,\n}\n```\nAppend it to items state and recompute stats.\n\n## Props\n- Board: add `onAddItem: (status: ConsultItem['status'], title: string) => void`\n- Change the `<span className='text-fg-mute'>+</span>` to a `<button type='button'>` with the same visual style plus `onClick={() => setAddingToColumn(column.key)}`.\n\n## Inline form styling\nThe form should match the card list area: `bg-bg-2 rounded-md border border-accent px-2 py-2 mb-1.5`. Input: `w-full bg-transparent text-sm text-fg outline-none placeholder:text-fg-faint`. Buttons row below input: small pill buttons.",
+      "stage": "ingest",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-005", "TASK-001"],
+      "output": "Made the column header + controls functional: clicking + opens an inline add form in that column with autofocus, Enter-to-submit, Escape-to-cancel, and Add/× buttons. Submitting calls back to page.tsx to append a MAN-* item with the correct kind/status/waiting flags and recomputes stats.",
+      "files": ["web/components/Board.tsx", "web/app/page.tsx"],
+      "updated_at": "2026-04-24T16:55:00+0800"
+    }
+  ,
+    {
+      "id": "TASK-033",
+      "title": "Allow manual status transitions on items",
+      "description": "Let users move items between kanban columns by changing the status field in the RightPanel detail view.\n\n## page.tsx\nAdd `handleStatusChange(id: string, status: ConsultItem['status']): void` — finds the item by id and updates its status in the items array. Recompute stats from the updated list. Pass as `onStatusChange` prop to RightPanel.\n\n## RightPanel.tsx detail mode\nThe detail-grid currently renders `Status` as a static value. Replace it with a segmented control showing all four statuses inline:\n\n```\n[ Todo ]  [ In progress ]  [ Waiting on client ]  [ Done ]\n```\n\nImplementation:\n- Render four `<button>` elements in a row, each for one status: todo / doing / waiting / done.\n- Active status: `bg-bg-3 text-fg border-line-2` (highlighted).\n- Inactive: `text-fg-dim hover:text-fg border-transparent`.\n- Shared wrapper: `flex rounded-md border border-line bg-bg-2 p-0.5 text-[11px]`.\n- Each button: `rounded px-2 py-1 transition border`.\n- Clicking an inactive status calls `onStatusChange(selectedItem.id, newStatus)`.\n\n## Props change\nAdd `onStatusChange: (id: string, status: ConsultItem['status']) => void` to RightPanelProps.",
+      "stage": "execute",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-011", "TASK-012"],
+      "output": "Added a page-level status updater and exposed it through RightPanel. In detail mode, Status is now a 4-option segmented control (todo/doing/waiting/done) that updates the item's status and immediately moves it between Board columns while recomputing stats.",
+      "files": ["web/app/page.tsx", "web/components/RightPanel.tsx"],
+      "updated_at": "2026-04-24T17:05:00+0800"
+    }
+  ,
+    {
+      "id": "TASK-034",
+      "title": "Write auto-action agent prompt and define action types",
+      "description": "Written at web/prompts/agent-autoaction.txt. Four action types keyed by item kind:\n- draft_nudge (waiting): polite follow-up email to the external party\n- draft_memo (task): internal action memo for the owner\n- escalation_note (blocker): brief escalation note for a senior stakeholder\n- risk_memo (risk): risk register entry for a steering committee\n\nMock responses for all four actions added to web/lib/mocks.ts as MOCK_AUTO_ACTIONS (Record<string, AutoActionResult>). AutoActionResult type exported from mocks.ts: { actionType, label, content, suggestedNext }.\n\nThis task is done.",
+      "stage": "execute",
+      "owner": "claude",
+      "status": "done",
+      "dependencies": ["TASK-001"],
+      "output": "Written web/prompts/agent-autoaction.txt with four action types (draft_nudge, draft_memo, escalation_note, risk_memo). Added MOCK_AUTO_ACTIONS and AutoActionResult type to web/lib/mocks.ts.",
+      "files": ["web/prompts/agent-autoaction.txt", "web/lib/mocks.ts"],
+      "updated_at": "2026-04-24T17:10:00+0800"
+    }
+  ,
+    {
+      "id": "TASK-035",
+      "title": "Implement auto-action agent endpoint and wire UI",
+      "description": "Wire automated per-item actions from the detail panel through a backend agent endpoint.\n\n## Backend: web/app/api/auto-action/route.ts\nPOST handler accepting `{ item: ConsultItem, action: string }` in the request body.\n\nMock guard (always check first):\n```typescript\nif (process.env.MOCK_AI === 'true') {\n  const { MOCK_AUTO_ACTIONS } = await import('@/lib/mocks');\n  const result = MOCK_AUTO_ACTIONS[action] ?? MOCK_AUTO_ACTIONS['draft_memo'];\n  return NextResponse.json(result);\n}\n```\n\nReal path:\n1. Read AUTO_ACTION_AGENT_ID from process.env.\n2. Create a session: anthropic.beta.agents.sessions.create({ agent_id: AUTO_ACTION_AGENT_ID }).\n3. Send JSON.stringify({ item, action }) as the user message.\n4. Stream/poll until complete, extract assistant text, JSON.parse into AutoActionResult.\n5. Return the parsed result. Handle missing agent ID (500), parse errors (422).\nBeta header: 'managed-agents-2026-04-01'.\n\nAlso add AUTO_ACTION_AGENT_ID creation to web/scripts/setup-agents.ts (same pattern as the other three agents, using web/prompts/agent-autoaction.txt as the system prompt, model: claude-haiku-4-5).\n\n## UI: RightPanel.tsx detail mode\nBelow the status segmented control, add an 'Automated actions' section.\n\nDerived available actions from item.kind:\n- task → [{ action: 'draft_memo', label: 'Draft action memo' }]\n- waiting → [{ action: 'draft_nudge', label: 'Draft nudge email' }]\n- blocker → [{ action: 'escalation_note', label: 'Write escalation note' }]\n- risk → [{ action: 'risk_memo', label: 'Write risk memo' }]\n\nRender each as a button: `border border-line bg-bg-2 rounded-md px-3 py-2 text-sm text-fg-dim hover:border-line-2 hover:text-fg transition w-full text-left`.\n\nClicking triggers `onRunAction(item.id, action)`. While running (runningAction === `${item.id}:${action}`), show a small inline spinner and 'Running…'. Disable while running.\n\nWhen the result exists in actionResults (`${item.id}:${action}` key), show a result card below the button:\n- label pill + Copy button (copies content to clipboard)\n- content in a scrollable pre-wrap block (max-h-48 overflow-y-auto text-sm text-fg-dim font-mono)\n- suggestedNext in italic text-xs text-fg-faint\n- Result card style: `mt-2 rounded-md border border-line bg-bg-1 p-3 space-y-2`\n\n## page.tsx\n- Add `actionResults: Record<string, AutoActionResult>` state (default {}, keyed by `${id}:${action}`).\n- Add `runningAction: string | null` state.\n- Add `handleRunAction(id: string, action: string)`: sets runningAction, POSTs to /api/auto-action with { item: items.find(i => i.id === id), action }, stores result in actionResults under `${id}:${action}` key, clears runningAction.\n- Pass `actionResults`, `runningAction`, `onRunAction` as props to RightPanel.\n\n## RightPanel props additions\n- `actionResults: Record<string, AutoActionResult>`\n- `runningAction: string | null`\n- `onRunAction: (id: string, action: string) => void`\n\nImport `AutoActionResult` type from '@/lib/mocks'.",
+      "stage": "execute",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-034", "TASK-033", "TASK-011"],
+      "output": "Implemented the auto-action endpoint with mock guard, added the auto-action agent to setup-agents.ts, wired handleRunAction in page.tsx, and added the Automated actions section to RightPanel detail mode with result display and suggestedNext.",
+      "files": ["web/app/api/auto-action/route.ts", "web/app/page.tsx", "web/components/RightPanel.tsx", "web/scripts/setup-agents.ts"],
+      "updated_at": "2026-04-24T18:10:00+0800"
+    }
   ]
 }

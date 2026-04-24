@@ -176,3 +176,7 @@ You MUST:
 - update `updated_at` where relevant
 
 No explanations. No markdown. No comments.
+
+## GSK CLI
+
+This project uses the Genspark CLI. Follow [CONTEXT.md](CONTEXT.md) for available tools and usage rules.

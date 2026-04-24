@@ -1,2 +1,4 @@
 .claude/settings.local.json
 web/tsconfig.tsbuildinfo
+/.gsk
+.opencode.json

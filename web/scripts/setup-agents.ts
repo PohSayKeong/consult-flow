@@ -12,6 +12,7 @@ const envKeys = {
   extractor: "EXTRACTOR_AGENT_ID",
   execution: "EXECUTION_AGENT_ID",
   email: "EMAIL_AGENT_ID",
+  autoaction: "AUTO_ACTION_AGENT_ID",
   environment: "MANAGED_ENVIRONMENT_ID",
 } as const;
 
@@ -125,18 +126,25 @@ async function main() {
     "ConsultFlow Email",
     "agent-email.txt",
   );
+  const autoactionId = await ensureAgent(
+    "autoaction",
+    "ConsultFlow Auto-Action",
+    "agent-autoaction.txt",
+  );
 
   writeEnvValues({
     [envKeys.environment]: environmentId,
     [envKeys.extractor]: extractorId,
     [envKeys.execution]: executionId,
     [envKeys.email]: emailId,
+    [envKeys.autoaction]: autoactionId,
   });
 
   console.log(`${envKeys.environment}=${environmentId}`);
   console.log(`${envKeys.extractor}=${extractorId}`);
   console.log(`${envKeys.execution}=${executionId}`);
   console.log(`${envKeys.email}=${emailId}`);
+  console.log(`${envKeys.autoaction}=${autoactionId}`);
 }
 
 main().catch((error) => {
