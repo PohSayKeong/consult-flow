@@ -382,10 +382,6 @@ export default function Home() {
     setIsSummarizingDelay(true);
     setSummaryError(null);
 
-    window.setTimeout(() => {
-      setIsSummarizingDelay(false);
-    }, 1500);
-
     try {
       const digestItems = digestIds
         .map((id) => items.find((item) => item.id === id))
@@ -397,8 +393,11 @@ export default function Home() {
       );
     } finally {
       setIsSummarizing(false);
+      setTimeout(() => {
+        setIsSummarizingDelay(false);
+      }, 1500);
     }
-  }, [digestIds, generateSummary, isSummarizing, items]);
+  }, [digestIds, generateSummary, isSummarizing, isSummarizingDelay, items]);
 
   const handleRunAction = useCallback(
     async (itemId: string, action: string) => {
