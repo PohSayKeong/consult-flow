@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0b0c0f;
+  --bg-1: #0f1115;
+  --bg-2: #14171d;
+  --bg-3: #1a1e26;
+  --line: #23262f;
+  --line-2: #2a2e38;
+  --fg: #e7e9ee;
+  --fg-dim: #a2a7b3;
+  --fg-mute: #6b7280;
+  --fg-faint: #4b5160;
+  --accent: #7c7aff;
+  --accent-weak: #2a2a6a;
+  --accent-glow: rgba(124, 122, 255, 0.18);
+  --warn: #f5a524;
+  --warn-weak: #3a2a10;
+  --danger: #ef4444;
+  --danger-weak: #3a1616;
+  --ok: #22c55e;
+  --ok-weak: #0f2a1a;
+  --info: #38bdf8;
+  --info-weak: #0e2636;
+  --radius: 6px;
+  --radius-lg: 10px;
+  --pad-y: 10px;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(124, 122, 255, 0.16), transparent 24%),
+    var(--bg);
+  color: var(--fg);
+  font-family: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+
+button,
+textarea,
+input {
+  font: inherit;
+}
+
+::selection {
+  background: var(--accent-weak);
+  color: var(--fg);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 999px;
+  border: 2px solid var(--bg-1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fg-faint);
+}
+
+.mono {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(26, 30, 38, 0.94), rgba(15, 17, 21, 0.98));
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    transparent
+  );
+  animation: shimmer 1.7s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(124, 122, 255, 0.18);
+  }
+
+  50% {
+    box-shadow: 0 0 0 10px rgba(124, 122, 255, 0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
