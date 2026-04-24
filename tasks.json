@@ -411,6 +411,42 @@
       "output": "Implemented the auto-action endpoint with mock guard, added the auto-action agent to setup-agents.ts, wired handleRunAction in page.tsx, and added the Automated actions section to RightPanel detail mode with result display and suggestedNext.",
       "files": ["web/app/api/auto-action/route.ts", "web/app/page.tsx", "web/components/RightPanel.tsx", "web/scripts/setup-agents.ts"],
       "updated_at": "2026-04-24T18:10:00+0800"
+    },
+    {
+      "id": "TASK-036",
+      "title": "Landing page with hero and feature sections",
+      "description": "Create web/app/page.tsx as a dark-themed marketing landing page matching consultflow.png. Elements: fixed nav with ConsultFlow logo + Tasks/Open app links, hero section with tagline + description + CTA buttons, 3-column feature grid (Extract commitments / Flag blockers early / Client-ready digest), How it works section with left text + right mockup panel, CTA band, footer. Move the full app shell to web/app/app/page.tsx so /app is the app and / is the landing page.",
+      "stage": "communicate",
+      "owner": "claude",
+      "status": "done",
+      "dependencies": ["TASK-012", "TASK-015"],
+      "output": "Created the dark landing page at web/app/page.tsx with hero, feature grid, how-it-works section, CTA band, and footer. Moved the app shell to web/app/app/page.tsx so /app renders the full workflow app and / renders the landing page.",
+      "files": ["web/app/page.tsx", "web/app/app/page.tsx", "web/components/Sidebar.tsx"],
+      "updated_at": "2026-04-24T18:30:00+0800"
+    },
+    {
+      "id": "TASK-037",
+      "title": "Replace status segmented control with dropdown in detail view",
+      "description": "The 4-button segmented status control in RightPanel detail mode caused layout overflow. Replaced with a native <select> dropdown styled to match the dark theme, which eliminates the overflow while keeping the same onChange handler.",
+      "stage": "communicate",
+      "owner": "claude",
+      "status": "done",
+      "dependencies": ["TASK-033"],
+      "output": "Replaced the 4-button segmented control with a styled <select> dropdown matching the dark theme, resolving the overflow issue in the detail panel.",
+      "files": ["web/components/RightPanel.tsx"],
+      "updated_at": "2026-04-24T18:30:00+0800"
+    },
+    {
+      "id": "TASK-038",
+      "title": "Card glow reacts to status=waiting not just waiting flag",
+      "description": "The Card component showed a cyan glow/border only when item.waiting was true, but not when item.status was changed to 'waiting' via the dropdown. Fixed by changing the condition from item.waiting to item.waiting || item.status === 'waiting' in both the card wrapper className and the left accent bar, and updating the kind badge display logic to show the 'awaiting' badge when status=waiting.",
+      "stage": "communicate",
+      "owner": "claude",
+      "status": "done",
+      "dependencies": ["TASK-037", "TASK-021"],
+      "output": "Updated Card.tsx to react to item.status === 'waiting' in addition to item.waiting for the glow effect and badge display.",
+      "files": ["web/components/Card.tsx"],
+      "updated_at": "2026-04-24T18:30:00+0800"
     }
   ]
 }

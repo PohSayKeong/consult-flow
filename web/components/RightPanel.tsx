@@ -321,35 +321,17 @@ function DetailMode({
         <div className="text-fg-mute">Due</div>
         <div>{item.due}</div>
         <div className="text-fg-mute">Status</div>
-        <div className="flex rounded-md border border-line bg-bg-2 p-0.5 text-[11px]">
-          {([
-            { key: "todo", label: "Todo" },
-            { key: "doing", label: "In progress" },
-            { key: "waiting", label: "Awaiting client" },
-            { key: "done", label: "Done" },
-          ] as const).map((status) => {
-            const active = item.status === status.key;
-
-            return (
-              <button
-                key={status.key}
-                type="button"
-                onClick={() => {
-                  if (!active) {
-                    onStatusChange(item.id, status.key);
-                  }
-                }}
-                className={`rounded border px-2 py-1 transition ${
-                  active
-                    ? "border-line-2 bg-bg-3 text-fg"
-                    : "border-transparent text-fg-dim hover:text-fg"
-                }`}
-              >
-                {status.label}
-              </button>
-            );
-          })}
-        </div>
+        <select
+          value={item.status}
+          onChange={(e) => onStatusChange(item.id, e.target.value as ConsultItem["status"])}
+          className="w-full cursor-pointer rounded border border-line bg-bg-2 px-2 py-1 text-[11px] text-fg outline-none hover:border-line-2 focus:border-accent"
+        >
+          {(["todo", "doing", "waiting", "done"] as const).map((s) => (
+            <option key={s} value={s}>
+              {statusLabel[s]}
+            </option>
+          ))}
+        </select>
         <div className="text-fg-mute">Type</div>
         <div>
           {meta.label}

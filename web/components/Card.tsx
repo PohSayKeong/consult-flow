@@ -65,25 +65,25 @@ export default function Card({
       type="button"
       onClick={onClick}
       className={`relative w-full animate-cardIn rounded-md border bg-bg-1 p-[10px] text-left transition hover:border-line-2 hover:bg-bg-2 ${
-        item.waiting
+        item.waiting || item.status === "waiting"
           ? "border-[rgba(56,189,248,0.45)] bg-[rgba(14,38,54,0.2)]"
           : "border-line"
       } ${selected ? "ring-1 ring-accent ring-offset-0" : ""}`}
     >
-      {item.waiting ? (
+      {item.waiting || item.status === "waiting" ? (
         <span className="absolute bottom-2 left-0 top-2 w-0.5 rounded-r-sm bg-info shadow-[0_0_10px_var(--info)]" />
       ) : null}
 
       <div className="mb-1 flex items-center gap-1.5 text-[10.5px] text-fg-faint">
         <span className="mono">{item.id}</span>
-        {!item.waiting ? (
+        {!(item.waiting || item.status === "waiting") ? (
           <span
             className={`inline-flex items-center rounded-[3px] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] ${meta.className}`}
           >
             {meta.label}
           </span>
         ) : null}
-        {item.waiting ? (
+        {item.waiting || item.status === "waiting" ? (
           <span className="inline-flex items-center rounded-[3px] bg-[var(--info-weak)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] text-info">
             {item.tags[0] ?? "awaiting"}
           </span>
