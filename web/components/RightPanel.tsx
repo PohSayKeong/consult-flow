@@ -11,9 +11,13 @@ type RightPanelProps = {
   selectedItem: ConsultItem | null;
   onBack: () => void;
   onStatusChange: (id: string, status: ConsultItem["status"]) => void;
+  onSelectItem?: (id: string) => void;
   onToggleDigest?: (id: string) => void;
   onGenerateSummary?: () => void;
+  onSendEmail?: () => void;
   isGeneratingSummary?: boolean;
+  isSendingEmail?: boolean;
+  emailSent?: boolean;
   actionResults?: Record<string, AutoActionResult>;
   runningAction?: string | null;
   onRunAction?: (itemId: string, action: string) => void;
@@ -77,13 +81,21 @@ function SummaryMode({
   summary,
   digestIds,
   onGenerateSummary,
+  onSendEmail,
   isGeneratingSummary,
+  isSendingEmail,
+  emailSent,
+  onSelectItem,
 }: {
   items: ConsultItem[];
   summary: SummaryData | null;
   digestIds: string[];
   onGenerateSummary: (() => void) | undefined;
+  onSendEmail: (() => void) | undefined;
   isGeneratingSummary: boolean;
+  isSendingEmail: boolean;
+  emailSent: boolean;
+  onSelectItem: ((id: string) => void) | undefined;
 }) {
   if (items.length === 0) {
     return (
@@ -148,13 +160,15 @@ function SummaryMode({
 
           <div className="mt-3 space-y-2">
             {digestItems.map((item) => (
-              <div
+              <button
                 key={item.id}
-                className="flex items-start gap-2 rounded-[8px] border border-line bg-bg-1 px-3 py-2"
+                type="button"
+                onClick={() => onSelectItem?.(item.id)}
+                className="flex w-full items-start gap-2 rounded-[8px] border border-line bg-bg-1 px-3 py-2 text-left transition hover:border-line-2 hover:bg-bg-2"
               >
-                <span className="mono mt-0.5 text-[11px] text-fg-faint">{item.id}</span>
+                <span className="whitespace-nowrap mono mt-0.5 text-[11px] text-fg-faint">{item.id}</span>
                 <span className="text-sm text-fg-dim line-clamp-2">{item.title}</span>
-              </div>
+              </button>
             ))}
           </div>
         </section>
@@ -181,11 +195,23 @@ function SummaryMode({
         </div>
       ) : null}
 
-      {summary ? (
+{summary ? (
         <>
           <section className="rounded-[8px] border border-line bg-bg-2 p-4">
-            <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
-              Executive summary
+            <div className="flex items-center justify-between">
+              <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+                Executive summary
+              </div>
+              {onGenerateSummary ? (
+                <button
+                  type="button"
+                  onClick={onGenerateSummary}
+                  disabled={isGeneratingSummary || digestIds.length === 0}
+                  className="rounded-md border border-accent bg-bg px-3 py-1.5 text-sm text-accent transition hover:border-accent-2 hover:text-accent-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isGeneratingSummary ? "Regenerating…" : "Regenerate"}
+                </button>
+              ) : null}
             </div>
             <div className="mt-3 space-y-3 text-sm leading-6 text-fg-dim">
               {paragraphs.map((paragraph) => (
@@ -194,22 +220,22 @@ function SummaryMode({
                   dangerouslySetInnerHTML={{
                     __html: paragraph
                       .replaceAll("class='em'", "class='text-fg font-medium'")
-                      .replaceAll('class=\"em\"', 'class=\"text-fg font-medium\"')
+                      .replaceAll('class="em"', 'class="text-fg font-medium"')
                       .replaceAll(
                         "class='em-warn'",
                         "class='text-warn font-medium'",
                       )
                       .replaceAll(
-                        'class=\"em-warn\"',
-                        'class=\"text-warn font-medium\"',
+                        'class="em-warn"',
+                        'class="text-warn font-medium"',
                       )
                       .replaceAll(
                         "class='em-risk'",
                         "class='text-danger font-medium'",
                       )
                       .replaceAll(
-                        'class=\"em-risk\"',
-                        'class=\"text-danger font-medium\"',
+                        'class="em-risk"',
+                        'class="text-danger font-medium"',
                       ),
                   }}
                 />
@@ -243,6 +269,19 @@ function SummaryMode({
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="mt-4 flex items-center gap-3">
+<button
+                type="button"
+                onClick={onSendEmail}
+                disabled={isSendingEmail || digestIds.length === 0}
+                className="rounded-md border border-accent bg-transparent px-3 py-2 text-sm text-accent transition hover:bg-accent hover:text-bg disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSendingEmail ? "Sending…" : emailSent ? "Sent to client" : "Send digest"}
+              </button>
+              {emailSent && (
+                <span className="text-[11px] text-fg-faint">Formal tone</span>
+              )}
             </div>
           </section>
 
@@ -502,9 +541,13 @@ export default function RightPanel({
   selectedItem,
   onBack,
   onStatusChange,
+  onSelectItem,
   onToggleDigest,
   onGenerateSummary,
+  onSendEmail,
   isGeneratingSummary = false,
+  isSendingEmail = false,
+  emailSent = false,
   actionResults,
   runningAction,
   onRunAction,
@@ -583,7 +626,11 @@ export default function RightPanel({
             summary={summary}
             digestIds={digestIds}
             onGenerateSummary={onGenerateSummary}
+            onSendEmail={onSendEmail}
             isGeneratingSummary={isGeneratingSummary}
+            isSendingEmail={isSendingEmail}
+            emailSent={emailSent}
+            onSelectItem={onSelectItem}
           />
         )}
       </div>

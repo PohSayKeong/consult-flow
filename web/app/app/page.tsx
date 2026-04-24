@@ -138,6 +138,8 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailResult, setEmailResult] = useState<{ tone: string } | null>(null);
   const [actionResults, setActionResults] = useState<
     Record<string, AutoActionResult>
   >({});
@@ -175,7 +177,7 @@ export default function Home() {
     () =>
       ({
         "--source-w": sourcePanelOpen ? "360px" : "0px",
-        "--right-w": showRightPanel ? "300px" : "0px",
+        "--right-w": showRightPanel ? "360px" : "0px",
       }) as CSSProperties,
     [showRightPanel, sourcePanelOpen],
   );
@@ -202,6 +204,10 @@ export default function Home() {
 
   const handleBack = useCallback(() => {
     setSelectedId(null);
+  }, []);
+
+  const handleSelectItem = useCallback((id: string) => {
+    setSelectedId(id);
   }, []);
 
   const toggleDigest = useCallback((id: string) => {
@@ -265,7 +271,7 @@ export default function Home() {
     (id: string, status: ConsultItem["status"]) => {
       setItems((current) => {
         const next = current.map((item) =>
-          item.id === id ? { ...item, status } : item,
+          item.id === id ? { ...item, status, waiting: status === "waiting" } : item,
         );
         setStats(computeStats(next));
         return next;
@@ -273,6 +279,15 @@ export default function Home() {
     },
     [],
   );
+
+  const handleSendEmail = useCallback(async () => {
+    if (emailResult || isSendingEmail) return;
+
+    setIsSendingEmail(true);
+    await new Promise((r) => setTimeout(r, 1200));
+    setEmailResult({ tone: "Formal" });
+    setIsSendingEmail(false);
+  }, [emailResult, isSendingEmail]);
 
   const parseSourceTab = useCallback(
     async (tab: SourceTab) => {
@@ -488,6 +503,7 @@ export default function Home() {
                 selectedId={selectedId}
                 onSelect={handleBoardSelect}
                 onAddItem={handleAddItem}
+                onStatusChange={handleStatusChange}
                 loading={isParsing}
               />
               {errorMessage ? (
@@ -510,9 +526,13 @@ export default function Home() {
                     selectedItem={selectedItem}
                     onBack={handleBack}
                     onStatusChange={handleStatusChange}
+                    onSelectItem={handleSelectItem}
                     onToggleDigest={toggleDigest}
                     onGenerateSummary={handleGenerateSummary}
+                    onSendEmail={handleSendEmail}
                     isGeneratingSummary={isSummarizing}
+                    isSendingEmail={isSendingEmail}
+                    emailSent={!!emailResult}
                     actionResults={actionResults}
                     runningAction={runningAction}
                     onRunAction={handleRunAction}

@@ -52,40 +52,47 @@ function getDueClass(dueFlag: ConsultItem["dueFlag"]) {
   return "text-fg-mute";
 }
 
-export default function Card({
-  item,
-  selected = false,
-  onClick,
-}: CardProps) {
+type StatusGlow = {
+  border: string;
+  bar: string;
+};
+
+function getStatusGlow(status: ConsultItem["status"]): StatusGlow | null {
+  if (status === "waiting") {
+    return { border: "border-[rgba(56,189,248,0.45)]", bar: "bg-info shadow-[0_0_10px_var(--info)]" };
+  }
+  if (status === "doing") {
+    return { border: "border-[rgba(99,102,241,0.45)]", bar: "bg-accent shadow-[0_0_10px_var(--accent)]" };
+  }
+  if (status === "done") {
+    return { border: "border-[rgba(52,211,153,0.45)]", bar: "bg-ok shadow-[0_0_10px_var(--ok)]" };
+  }
+  return null;
+}
+
+export function CardContent({ item, selected }: { item: ConsultItem; selected: boolean }) {
   const meta = kindMeta[item.kind];
   const ownerGradient = ownerGradients[item.owner] ?? ownerGradients.MK;
+  const statusGlow = getStatusGlow(item.status);
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`relative w-full animate-cardIn rounded-md border bg-bg-1 p-[10px] text-left transition hover:border-line-2 hover:bg-bg-2 ${
-        item.waiting
-          ? "border-[rgba(56,189,248,0.45)] bg-[rgba(14,38,54,0.2)]"
-          : "border-line"
-      } ${selected ? "ring-1 ring-accent ring-offset-0" : ""}`}
-    >
+    <>
       {item.waiting ? (
         <span className="absolute bottom-2 left-0 top-2 w-0.5 rounded-r-sm bg-info shadow-[0_0_10px_var(--info)]" />
+      ) : statusGlow ? (
+        <span className={`absolute bottom-2 left-0 top-2 w-0.5 rounded-r-sm ${statusGlow.bar}`} />
       ) : null}
 
-      <div className="mb-1 flex items-center gap-1.5 text-[10.5px] text-fg-faint">
+      <div className="mb-1 flex flex-wrap items-center gap-1.5 text-[10.5px] text-fg-faint">
         <span className="mono">{item.id}</span>
-        {!item.waiting ? (
-          <span
-            className={`inline-flex items-center rounded-[3px] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] ${meta.className}`}
-          >
-            {meta.label}
-          </span>
-        ) : null}
+        <span
+          className={`inline-flex items-center rounded-[3px] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] ${meta.className}`}
+        >
+          {meta.label}
+        </span>
         {item.waiting ? (
           <span className="inline-flex items-center rounded-[3px] bg-[var(--info-weak)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] text-info">
-            {item.tags[0] ?? "awaiting"}
+            waiting on client
           </span>
         ) : null}
       </div>
@@ -109,6 +116,26 @@ export default function Card({
           </>
         ) : null}
       </div>
+    </>
+  );
+}
+
+export default function Card({ item, selected = false, onClick }: CardProps) {
+  const meta = kindMeta[item.kind];
+  const ownerGradient = ownerGradients[item.owner] ?? ownerGradients.MK;
+  const statusGlow = getStatusGlow(item.status);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative w-full animate-cardIn rounded-md bg-bg-1 p-[10px] text-left transition-colors hover:border hover:border-white ${
+        item.waiting
+          ? "bg-[rgba(14,38,54,0.2)]"
+          : ""
+      } ${selected ? "ring-1 ring-accent ring-offset-0" : ""}`}
+    >
+      <CardContent item={item} selected={selected} />
     </button>
   );
 }

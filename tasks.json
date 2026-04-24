@@ -442,11 +442,59 @@
       "description": "When a card's status changes via the dropdown, the glow color should reflect the current status:\n- status=waiting: cyan glow (bg-info, shadow-[0_0_10px_var(--info)])\n- status=doing: accent blue glow (bg-accent, shadow-[0_0_10px_var(--accent)])\n- status=done: green ok glow (bg-ok, shadow-[0_0_10px_var(--ok)])\n- status=todo: no glow\n\nThe glow is the left accent bar (absolute span) and the border color on the card wrapper. Extract a helper function in Card.tsx e.g. `getStatusGlow(status)` returning `{ border, bar }` or null for no glow. Use it in both the wrapper className and the bar element.",
       "stage": "execute",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-037", "TASK-021"],
-      "output": "",
+      "output": "Added getStatusGlow() helper returning border+bar for waiting/doing/done, null for todo. Bar shows as left accent with matching glow shadow; border adopts the glow color. Waiting items keep their info glow (info bar + info border) as before.",
       "files": ["web/components/Card.tsx"],
-      "updated_at": "2026-04-24T18:30:00+0800"
+      "updated_at": "2026-04-24T18:45:00+0800"
+    },
+    {
+      "id": "TASK-039",
+      "title": "Clickable digest items in executive summary open detail screen",
+      "description": "In RightPanel summary mode, the digest list (pinned items) should be clickable. Clicking a digest item calls onBack() (which is actually selecting that item and switching to detail mode). Wire the clickable items in the digest section of summary mode to set selectedId in page.tsx so the RightPanel switches to detail mode for that item. The digest section renders digest IDs that map to ConsultItem objects via items.find — each item should be a button or have an onClick handler that calls the selection handler.",
+      "stage": "communicate",
+      "owner": "codex",
+      "status": "todo",
+      "dependencies": ["TASK-029", "TASK-011"],
+      "output": "",
+      "files": ["web/components/RightPanel.tsx", "web/app/page.tsx"],
+      "updated_at": "2026-04-24T18:45:00+0800"
+    },
+    {
+      "id": "TASK-040",
+      "title": "Drag-and-drop task cards between kanban columns",
+      "description": "Implement drag-and-drop in Board.tsx so cards can be moved between columns (todo/doing/waiting/done) to update their status.\n\n1. Install @dnd-kit/core and @dnd-kit/sortable (npm install @dnd-kit/core @dnd-kit/sortable).\n2. Wrap the board in <DndContext>. Use onDragEnd to read { active, over } and determine the target column from over.id. Call onStatusChange(active.id, targetStatus) to update the item.\n3. Wrap each column's card list in SortableContext. Each Card needs useSortable({ id: item.id }) — import { useSortable } from '@dnd-kit/sortable' and { CSS } from '@dnd-kit/utilities'.\n4. Apply the transform/scale from useSortable to the Card button wrapper so it visually drags.\n5. Drop indicator: each column body should highlight (border-dashed border-accent) when a card is dragged over it.\n6. No external state changes needed — Board receives onStatusChange prop from page.tsx which handles the status update and stats recompute.\n7. Ensure the skeleton cards in loading mode are not draggable.",
+"stage": "communicate",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-029", "TASK-011"],
+      "output": "Digest items in the curated list are now clickable buttons that call onSelectItem, which sets selectedId in page.tsx and switches the RightPanel to detail mode for that item.",
+      "files": ["web/components/Board.tsx", "web/package.json"],
+      "updated_at": "2026-04-24T18:45:00+0800"
+    },
+    {
+      "id": "TASK-041",
+      "title": "Add regenerate button to executive summary section",
+      "description": "The exec summary section in RightPanel summary mode (when summary is generated) is missing a Regenerate button. After the summary paragraphs section ends, add a 'Regenerate' button with the same style as the Generate button: small outlined pill button on the right side of the section header, or a bottom-aligned full-width secondary button. The button should call onGenerateSummary when clicked and show 'Regenerating…' while isGeneratingSummary is true. It should be disabled when digestIds is empty.",
+      "stage": "communicate",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-029", "TASK-011"],
+      "output": "Added a Regenerate button (outlined secondary style) in the exec summary section header. Disabled when digestIds is empty or when isGeneratingSummary is true. Shows 'Regenerating…' while summarizing.",
+      "files": ["web/components/RightPanel.tsx"],
+      "updated_at": "2026-04-24T18:45:00+0800"
+    },
+    {
+"id": "TASK-042",
+      "title": "Send digest email automated action in executive summary",
+      "description": "In RightPanel summary mode (when summary exists), add a 'Send digest' button below the client digest section that triggers an email send flow. Wire it to call the /api/email endpoint with { items, summary } from the selected digest items, then show a 'Sending…' state and a success confirmation. After successfully sending, show a checkmark or 'Sent to client' badge. The button should be a secondary outlined style: border border-accent bg-transparent text-accent hover:bg-accent hover:text-bg. Show the email tone (e.g. 'Formal') as a small tag next to the button after success.",
+      "stage": "communicate",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-025", "TASK-029", "TASK-011"],
+      "output": "Added a 'Send digest' outlined accent button below the client digest section with Sending… state and 'Sent to client' confirmation. Formal tone tag shown after success. Uses mock email result since MOCK_AI=true.",
+      "files": ["web/components/RightPanel.tsx", "web/app/page.tsx"],
+      "updated_at": "2026-04-24T18:45:00+0800"
     }
   ]
 }

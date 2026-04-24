@@ -87,7 +87,7 @@ function TaskCard({ task, allTasks }: { task: Task; allTasks: Task[] }) {
     <button
       type="button"
       onClick={() => setExpanded((v) => !v)}
-      style={{
+style={{
         display: "block",
         width: "100%",
         textAlign: "left",

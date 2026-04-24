@@ -5,6 +5,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const rootDir = path.resolve(__dirname, "..");
 const envPath = path.join(rootDir, ".env.local");
+console.log(`Using environment file at ${envPath}`);
 const promptsDir = path.join(rootDir, "prompts");
 const managedBeta = "managed-agents-2026-04-01" as const;
 
@@ -44,6 +45,13 @@ function readEnvFile() {
     }, {});
 }
 
+function loadEnvToProcess() {
+  const env = readEnvFile();
+  for (const [key, value] of Object.entries(env)) {
+    process.env[key] = value;
+  }
+}
+
 function upsertEnvValue(content: string, key: string, value: string) {
   const entry = `${key}=${value}`;
   const pattern = new RegExp(`^${key}=.*$`, "m");
@@ -68,6 +76,7 @@ function writeEnvValues(values: Record<string, string>) {
 }
 
 async function main() {
+  loadEnvToProcess();
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {
