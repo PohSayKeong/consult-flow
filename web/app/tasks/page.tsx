@@ -305,7 +305,7 @@ function StageColumn({
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, overflowY: "auto" }}>
-        {tasks.map((task) => (
+        {[...tasks].sort((a, b) => (a.status === "done" ? 1 : 0) - (b.status === "done" ? 1 : 0)).map((task) => (
           <TaskCard key={task.id} task={task} allTasks={allTasks} />
         ))}
         {tasks.length === 0 && (
