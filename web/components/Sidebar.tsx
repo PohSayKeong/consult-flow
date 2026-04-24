@@ -74,8 +74,8 @@ export default function Sidebar({ items, collapsed, onToggle }: SidebarProps) {
           collapsed ? "flex-col justify-center gap-2 px-2" : "gap-3 px-4"
         }`}
       >
-        <div className="relative h-6 w-6 rounded-md border border-line-2 bg-[radial-gradient(circle_at_30%_30%,var(--accent),transparent_60%),linear-gradient(135deg,#2a2d3a,#0f1115)] shadow-[0_0_0_0.5px_var(--accent-glow),0_6px_20px_-8px_var(--accent-glow)]">
-          <div className="absolute inset-[4px] rounded-full border border-transparent [background:conic-gradient(from_210deg,transparent_0_30%,var(--accent)_30%_55%,transparent_55%_100%)] [mask:radial-gradient(circle,transparent_40%,#000_41%)] [-webkit-mask:radial-gradient(circle,transparent_40%,#000_41%)]" />
+        <div className="h-6 w-6 overflow-hidden rounded-md">
+          <img src="/consultflow.png" alt="ConsultFlow" className="h-full w-full object-contain" />
         </div>
         {collapsed ? (
           <span
