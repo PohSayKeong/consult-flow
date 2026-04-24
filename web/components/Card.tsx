@@ -20,7 +20,7 @@ const kindMeta = {
     className: "bg-[var(--danger-weak)] text-danger",
   },
   waiting: {
-    label: "Waiting",
+    label: "Client dependency",
     className: "bg-[var(--info-weak)] text-info",
   },
 } satisfies Record<
@@ -76,14 +76,16 @@ export default function Card({
 
       <div className="mb-1 flex items-center gap-1.5 text-[10.5px] text-fg-faint">
         <span className="mono">{item.id}</span>
-        <span
-          className={`inline-flex items-center rounded-[3px] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] ${meta.className}`}
-        >
-          {meta.label}
-        </span>
+        {!item.waiting ? (
+          <span
+            className={`inline-flex items-center rounded-[3px] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] ${meta.className}`}
+          >
+            {meta.label}
+          </span>
+        ) : null}
         {item.waiting ? (
           <span className="inline-flex items-center rounded-[3px] bg-[var(--info-weak)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] text-info">
-            from client
+            {item.tags[0] ?? "awaiting"}
           </span>
         ) : null}
       </div>

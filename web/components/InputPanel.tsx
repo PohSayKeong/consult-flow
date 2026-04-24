@@ -16,6 +16,7 @@ export type InputPanelProps = {
   isParsing?: boolean;
   activeTab: SourceTab;
   onTabChange: (tab: SourceTab) => void;
+  onToggle?: () => void;
   attn?: boolean;
   highlights?: InputHighlight[];
   onHighlightSelect?: (id: string) => void;
@@ -94,6 +95,7 @@ export default function InputPanel({
   isParsing = false,
   activeTab,
   onTabChange,
+  onToggle,
   attn = false,
   highlights = [],
   onHighlightSelect,
@@ -137,6 +139,31 @@ export default function InputPanel({
               Source
             </h2>
           </div>
+          {onToggle ? (
+            <button
+              type="button"
+              onClick={onToggle}
+              title="Hide source"
+              className="rounded-md border border-line bg-bg-2 p-2 text-fg-dim transition hover:border-line-2 hover:text-fg"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                width="16"
+                height="16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12.25 5.25L7.75 10l4.5 4.75"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          ) : null}
         </div>
 
         <div className="mt-4 flex gap-5">

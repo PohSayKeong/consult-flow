@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ConsultItem, SummaryData } from "@/types/schema";
+import type { AutoActionResult } from "@/lib/mocks";
 
 type RightPanelProps = {
   items: ConsultItem[];
@@ -9,9 +10,13 @@ type RightPanelProps = {
   digestIds: string[];
   selectedItem: ConsultItem | null;
   onBack: () => void;
-  onAddToDigest: (id: string) => void;
-  onGenerateDigest: () => void;
-  isRegenerating?: boolean;
+  onStatusChange: (id: string, status: ConsultItem["status"]) => void;
+  onToggleDigest?: (id: string) => void;
+  onGenerateSummary?: () => void;
+  isGeneratingSummary?: boolean;
+  actionResults?: Record<string, AutoActionResult>;
+  runningAction?: string | null;
+  onRunAction?: (itemId: string, action: string) => void;
 };
 
 const ownerGradients: Record<string, string> = {
@@ -37,7 +42,7 @@ const kindMeta = {
     className: "bg-[var(--danger-weak)] text-danger",
   },
   waiting: {
-    label: "Waiting",
+    label: "Client dependency",
     className: "bg-[var(--info-weak)] text-info",
   },
 } satisfies Record<
@@ -51,7 +56,7 @@ const kindMeta = {
 const statusLabel: Record<ConsultItem["status"], string> = {
   todo: "Todo",
   doing: "In progress",
-  waiting: "Waiting on client",
+  waiting: "Awaiting client",
   done: "Done",
 };
 
@@ -71,14 +76,14 @@ function SummaryMode({
   items,
   summary,
   digestIds,
-  onGenerateDigest,
-  isRegenerating,
+  onGenerateSummary,
+  isGeneratingSummary,
 }: {
   items: ConsultItem[];
   summary: SummaryData | null;
   digestIds: string[];
-  onGenerateDigest: () => void;
-  isRegenerating: boolean;
+  onGenerateSummary: (() => void) | undefined;
+  isGeneratingSummary: boolean;
 }) {
   if (items.length === 0) {
     return (
@@ -99,7 +104,7 @@ function SummaryMode({
     );
   }
 
-  if (digestIds.length === 0) {
+  if (!summary && digestIds.length === 0) {
     return (
       <div className="grid min-h-full place-items-center p-5">
         <div className="max-w-[260px] rounded-xl border border-dashed border-line bg-bg-1 p-5 text-center">
@@ -107,133 +112,74 @@ function SummaryMode({
             Digest
           </div>
           <div className="mt-2 text-base font-semibold text-fg">
-            No items in digest yet
+            Add tasks to the digest
           </div>
           <p className="mt-3 text-sm leading-6 text-fg-dim">
-            Open a card and click <span className="text-fg">Add to digest</span> to get
-            started.
+            Open a card and click <span className="text-fg">Add to digest</span> to
+            curate what gets summarized.
           </p>
         </div>
       </div>
     );
   }
 
-  const pinnedItems = digestIds
+  const digestItems = digestIds
     .map((id) => items.find((item) => item.id === id))
     .filter((item): item is ConsultItem => Boolean(item));
 
-  const total = pinnedItems.length;
-  const waiting = pinnedItems.filter((item) => item.waiting).length;
-  const blockers = pinnedItems.filter((item) => item.kind === "blocker").length;
-  const risks = pinnedItems.filter((item) => item.kind === "risk").length;
-  const done = pinnedItems.filter((item) => item.status === "done").length;
-  const doing = pinnedItems.filter((item) => item.status === "doing").length;
-  const waitingStatus = pinnedItems.filter((item) => item.status === "waiting").length;
-  const todo = pinnedItems.filter((item) => item.status === "todo").length;
-  const denom = Math.max(total, 1);
-  const movingPercent = Math.round(((done + doing) / denom) * 100);
-
-  const isGeneratePrimary = digestIds.length > 0 && !summary;
   const paragraphs = summary ? summaryParagraphs(summary) : [];
   const digest = summary?.clientDigest;
 
   return (
     <div className="space-y-5 p-4">
-      <section className="rounded-[8px] border border-line bg-bg-2 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
-              Digest items
+      {digestItems.length > 0 ? (
+        <section className="rounded-[8px] border border-line bg-bg-2 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+                Digest
+              </div>
+              <div className="mt-1 text-sm text-fg-dim">Curated items to summarize</div>
             </div>
-            <div className="mt-1 text-sm text-fg-dim">
-              Curated list for the client update
-            </div>
+            <span className="rounded-full border border-line bg-bg-1 px-2 py-1 text-[11px] text-fg-dim">
+              {digestItems.length} {digestItems.length === 1 ? "item" : "items"}
+            </span>
           </div>
-          <span className="rounded-full border border-line bg-bg-1 px-2 py-1 text-[11px] text-fg-dim">
-            {digestIds.length} {digestIds.length === 1 ? "item" : "items"}
-          </span>
-        </div>
 
-        <div className="mt-3 space-y-2">
-          {pinnedItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center gap-2 rounded-[8px] border border-line bg-bg-1 px-3 py-2"
-            >
-              <span className="mono text-[11px] text-fg-faint">{item.id}</span>
-              <span className="text-sm text-fg-dim line-clamp-2">{item.title}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onGenerateDigest}
-            disabled={digestIds.length === 0 || isRegenerating}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
-              isGeneratePrimary
-                ? "bg-accent text-bg hover:brightness-110"
-                : "border border-line bg-bg-1 text-fg-dim hover:border-line-2 hover:text-fg"
-            }`}
-          >
-            {isRegenerating ? "Generating…" : "Generate digest"}
-          </button>
-          <span className="rounded-md border border-line bg-bg-1 px-2.5 py-2 text-[11px] text-fg-dim">
-            {digestIds.length} {digestIds.length === 1 ? "item" : "items"}
-          </span>
-        </div>
-      </section>
-
-      {!summary ? (
-        <div className="rounded-[8px] border border-dashed border-line bg-bg-1 px-3 py-2 text-[11px] text-fg-faint">
-          Generate the digest to produce an executive summary, client digest, and provenance.
-        </div>
+          <div className="mt-3 space-y-2">
+            {digestItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-start gap-2 rounded-[8px] border border-line bg-bg-1 px-3 py-2"
+              >
+                <span className="mono mt-0.5 text-[11px] text-fg-faint">{item.id}</span>
+                <span className="text-sm text-fg-dim line-clamp-2">{item.title}</span>
+              </div>
+            ))}
+          </div>
+        </section>
       ) : null}
 
-      <section className="rounded-[8px] border border-line bg-bg-2 p-4">
-        <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.12em] text-fg-faint">
-          <span className="h-1.5 w-1.5 rounded-full bg-ok shadow-[0_0_8px_var(--ok)]" />
-          Snapshot · Current session
-        </div>
-
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          {[
-            { label: "Action items", value: total, tone: "text-accent" },
-            { label: "Waiting", value: waiting, tone: "text-info" },
-            { label: "Blockers", value: blockers, tone: "text-warn" },
-            { label: "Risks", value: risks, tone: "text-danger" },
-          ].map((stat) => (
-            <div key={stat.label} className="rounded-[8px] border border-line bg-bg-1 p-3">
-              <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
-                {stat.label}
-              </div>
-              <div className={`mt-2 text-2xl font-semibold ${stat.tone}`}>
-                {stat.value.toString().padStart(2, "0")}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 flex items-center gap-3 text-[11px] text-fg-mute">
-          <div className="flex h-1.5 flex-1 overflow-hidden rounded-full bg-bg-3">
-            <div className="bg-ok" style={{ width: `${(done / denom) * 100}%` }} />
-            <div
-              className="bg-accent"
-              style={{ width: `${(doing / denom) * 100}%` }}
-            />
-            <div
-              className="bg-info"
-              style={{ width: `${(waitingStatus / denom) * 100}%` }}
-            />
-            <div
-              className="bg-line-2"
-              style={{ width: `${(todo / denom) * 100}%` }}
-            />
+      {!summary ? (
+        <div className="rounded-[8px] border border-dashed border-line bg-bg-1 p-4">
+          <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+            Executive summary
           </div>
-          <span>{movingPercent}% moving</span>
+          <div className="mt-2 text-sm text-fg-dim">
+            Empty until you generate it.
+          </div>
+          {onGenerateSummary && digestIds.length > 0 ? (
+            <button
+              type="button"
+              onClick={onGenerateSummary}
+              disabled={isGeneratingSummary}
+              className="mt-4 w-full rounded-md bg-accent px-3 py-2 text-sm font-semibold text-bg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isGeneratingSummary ? "Generating…" : "Generate summary"}
+            </button>
+          ) : null}
         </div>
-      </section>
+      ) : null}
 
       {summary ? (
         <>
@@ -313,15 +259,32 @@ function DetailMode({
   item,
   onBack,
   inDigest,
-  onAddToDigest,
+  onToggleDigest,
+  onStatusChange,
+  actionResults,
+  runningAction,
+  onRunAction,
 }: {
   item: ConsultItem;
   onBack: () => void;
   inDigest: boolean;
-  onAddToDigest: (id: string) => void;
+  onToggleDigest: ((id: string) => void) | undefined;
+  onStatusChange: (id: string, status: ConsultItem["status"]) => void;
+  actionResults?: Record<string, AutoActionResult>;
+  runningAction?: string | null;
+  onRunAction?: (itemId: string, action: string) => void;
 }) {
   const meta = kindMeta[item.kind];
   const ownerGradient = ownerGradients[item.owner] ?? ownerGradients.MK;
+
+  const actions: { action: string; label: string }[] =
+    item.kind === "task"
+      ? [{ action: "draft_memo", label: "Draft action memo" }]
+      : item.kind === "waiting"
+        ? [{ action: "draft_nudge", label: "Draft nudge email" }]
+        : item.kind === "blocker"
+          ? [{ action: "escalation_note", label: "Write escalation note" }]
+          : [{ action: "risk_memo", label: "Write risk memo" }];
 
   return (
     <div className="p-4 text-[12.5px] text-fg">
@@ -358,7 +321,35 @@ function DetailMode({
         <div className="text-fg-mute">Due</div>
         <div>{item.due}</div>
         <div className="text-fg-mute">Status</div>
-        <div>{statusLabel[item.status]}</div>
+        <div className="flex rounded-md border border-line bg-bg-2 p-0.5 text-[11px]">
+          {([
+            { key: "todo", label: "Todo" },
+            { key: "doing", label: "In progress" },
+            { key: "waiting", label: "Awaiting client" },
+            { key: "done", label: "Done" },
+          ] as const).map((status) => {
+            const active = item.status === status.key;
+
+            return (
+              <button
+                key={status.key}
+                type="button"
+                onClick={() => {
+                  if (!active) {
+                    onStatusChange(item.id, status.key);
+                  }
+                }}
+                className={`rounded border px-2 py-1 transition ${
+                  active
+                    ? "border-line-2 bg-bg-3 text-fg"
+                    : "border-transparent text-fg-dim hover:text-fg"
+                }`}
+              >
+                {status.label}
+              </button>
+            );
+          })}
+        </div>
         <div className="text-fg-mute">Type</div>
         <div>
           {meta.label}
@@ -402,25 +393,118 @@ function DetailMode({
         </div>
       )}
 
+      {onRunAction ? (
+        <div className="mt-5">
+          <div className="mb-2 text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+            Automated actions
+          </div>
+          <div className="space-y-2">
+            {actions.map(({ action, label }) => {
+              const key = `${item.id}:${action}`;
+              const running = runningAction === key;
+              const result = actionResults?.[key];
+
+              return (
+                <div key={action}>
+                  <button
+                    type="button"
+                    onClick={() => onRunAction(item.id, action)}
+                    disabled={running}
+                    className="relative w-full rounded-md border border-line bg-bg-2 px-3 py-2 text-left text-sm text-fg-dim transition hover:border-line-2 hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <div className="flex items-center gap-2">
+                      {running ? (
+                        <svg
+                          className="h-3 w-3 animate-spin text-fg-mute"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeDasharray="31.4"
+                            strokeDashoffset="10"
+                          />
+                        </svg>
+                      ) : result ? (
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="text-accent"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      ) : (
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="text-fg-mute"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="8" x2="12" y2="12" />
+                          <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                      )}
+                      <span className={running ? "text-fg-mute" : ""}>
+                        {running ? "Running…" : label}
+                      </span>
+                    </div>
+                  </button>
+
+                  {result ? (
+                    <div className="mt-2 rounded-md border border-line bg-bg-1 p-3">
+                      <div className="mb-2 whitespace-pre-wrap text-[12px] leading-relaxed text-fg">
+                        {result.content}
+                      </div>
+                      {result.suggestedNext ? (
+                        <div className="mt-2 border-t border-line pt-2 text-[11px] text-fg-mute">
+                          <span className="text-accent">Next: </span>
+                          {result.suggestedNext}
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
       <div className="mt-4 flex gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            onAddToDigest(item.id);
-            onBack();
-          }}
-          className={`flex-1 rounded-md px-3 py-2 text-sm font-semibold transition ${
-            inDigest
-              ? "border border-line bg-bg-1 text-fg-dim hover:border-line-2 hover:text-fg"
-              : "bg-accent text-bg hover:brightness-110"
-          }`}
-        >
-          {inDigest ? "In digest ✓" : "Add to digest"}
-        </button>
+        {onToggleDigest ? (
+          <button
+            type="button"
+            onClick={() => {
+              onToggleDigest(item.id);
+              if (!inDigest) {
+                onBack();
+              }
+            }}
+            className={`flex-1 rounded-md px-3 py-2 text-sm font-semibold transition ${
+              inDigest
+                ? "border border-line bg-bg-1 text-fg-dim hover:border-line-2 hover:text-fg"
+                : "bg-accent text-bg hover:brightness-110"
+            }`}
+          >
+            {inDigest ? "In digest ✓" : "Add to digest"}
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={onBack}
-          className="rounded-md border border-line bg-bg-1 px-3 py-2 text-sm text-fg-dim transition hover:border-line-2 hover:text-fg"
+          className="flex-1 rounded-md border border-line bg-bg-1 px-3 py-2 text-sm text-fg-dim transition hover:border-line-2 hover:text-fg"
         >
           Back
         </button>
@@ -435,12 +519,15 @@ export default function RightPanel({
   digestIds,
   selectedItem,
   onBack,
-  onAddToDigest,
-  onGenerateDigest,
-  isRegenerating = false,
+  onStatusChange,
+  onToggleDigest,
+  onGenerateSummary,
+  isGeneratingSummary = false,
+  actionResults,
+  runningAction,
+  onRunAction,
 }: RightPanelProps) {
   const [copied, setCopied] = useState(false);
-  const [shared, setShared] = useState(false);
 
   const handleCopy = async () => {
     if (!summary) {
@@ -460,22 +547,6 @@ export default function RightPanel({
     await navigator.clipboard.writeText(copyText);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
-  };
-
-  const handleShareDigest = async () => {
-    if (!summary) {
-      return;
-    }
-
-    const digestText = [
-      `Next from client: ${summary.clientDigest.nextFromClient}`,
-      `Next from us: ${summary.clientDigest.nextFromUs}`,
-      `Flags: ${summary.clientDigest.flags}`,
-    ].join("\n");
-
-    await navigator.clipboard.writeText(digestText);
-    setShared(true);
-    window.setTimeout(() => setShared(false), 1500);
   };
 
   return (
@@ -507,15 +578,6 @@ export default function RightPanel({
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                 </svg>
               </button>
-              <button
-                type="button"
-                onClick={handleShareDigest}
-                disabled={!summary}
-                className="rounded-md border border-line bg-bg-1 px-2 py-1 text-[11px] transition hover:border-line-2 hover:text-fg disabled:cursor-not-allowed disabled:opacity-50"
-                title={shared ? "Digest copied" : "Share digest"}
-              >
-                {shared ? "Shared digest" : "Share digest"}
-              </button>
             </>
           ) : null}
         </span>
@@ -527,15 +589,19 @@ export default function RightPanel({
             item={selectedItem}
             onBack={onBack}
             inDigest={digestIds.includes(selectedItem.id)}
-            onAddToDigest={onAddToDigest}
+            onToggleDigest={onToggleDigest}
+            onStatusChange={onStatusChange}
+            actionResults={actionResults}
+            runningAction={runningAction}
+            onRunAction={onRunAction}
           />
         ) : (
           <SummaryMode
             items={items}
             summary={summary}
             digestIds={digestIds}
-            onGenerateDigest={onGenerateDigest}
-            isRegenerating={isRegenerating}
+            onGenerateSummary={onGenerateSummary}
+            isGeneratingSummary={isGeneratingSummary}
           />
         )}
       </div>

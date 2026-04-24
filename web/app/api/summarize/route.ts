@@ -5,12 +5,22 @@ import {
   parseJSONResponse,
   runManagedAgent,
 } from "@/lib/managedAgents";
-import { MOCK_SUMMARY } from "@/lib/mocks";
+import { buildMockSummary, MOCK_SUMMARY } from "@/lib/mocks";
 import type { ConsultItem, SummarizeResponse } from "@/types/schema";
 
 export async function POST(request: Request) {
   try {
     if (process.env.MOCK_AI === "true") {
+      try {
+        const body = (await request.json()) as { items?: ConsultItem[] };
+        const items = body.items;
+        if (Array.isArray(items)) {
+          return NextResponse.json(buildMockSummary(items));
+        }
+      } catch {
+        // ignore
+      }
+
       return NextResponse.json(MOCK_SUMMARY);
     }
 
