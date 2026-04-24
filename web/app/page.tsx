@@ -1,22 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import InputPanel, { SourceTab } from "@/components/InputPanel";
+import type { CSSProperties } from "react";
+import { useCallback, useMemo, useState } from "react";
+
+import Board from "@/components/Board";
+import InputPanel, {
+  type InputHighlight,
+  type SourceTab,
+} from "@/components/InputPanel";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import RightPanel from "@/components/RightPanel";
 import Sidebar from "@/components/Sidebar";
-
-type PrototypeItem = {
-  id: string;
-  kind: "task" | "blocker" | "risk" | "waiting";
-  waiting: boolean;
-};
-
-const initialItems: PrototypeItem[] = [
-  { id: "ACM-101", kind: "task", waiting: false },
-  { id: "ACM-102", kind: "waiting", waiting: true },
-  { id: "ACM-103", kind: "risk", waiting: false },
-  { id: "ACM-104", kind: "blocker", waiting: false },
-];
+import type {
+  ConsultItem,
+  ExtractResponse,
+  Stats,
+  SummarizeResponse,
+  SummaryData,
+} from "@/types/schema";
 
 const initialTranscript = `Client would like the Q3 operating review in final form by next Thursday.
 
@@ -27,165 +28,388 @@ We still need confirmation from the client PM on rollout sequencing for the pilo
 There is a risk that legal review slips if procurement redlines are not resolved this week.
 `;
 
-export default function Home() {
-  const [items] = useState<PrototypeItem[]>(initialItems);
-  const [selectedId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<SourceTab>("Transcript");
-  const [sourceText, setSourceText] = useState(initialTranscript);
-  const [isParsing, setIsParsing] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+const initialSourceText: Record<SourceTab, string> = {
+  Transcript: initialTranscript,
+  Email: "",
+  Notes: "",
+};
 
-  const handleParse = () => {
-    if (isParsing) {
+const emptyStats: Stats = {
+  total: 0,
+  waiting: 0,
+  blockers: 0,
+  risks: 0,
+};
+
+const loadingStepDurations = [375, 375, 375];
+const viewTabs = ["Board", "List", "Timeline"] as const;
+const accentThemes = {
+  blue: {
+    accent: "#7c7aff",
+    weak: "rgba(124,122,255,0.14)",
+    glow: "rgba(124,122,255,0.32)",
+  },
+  amber: {
+    accent: "#f59e0b",
+    weak: "rgba(245,158,11,0.16)",
+    glow: "rgba(245,158,11,0.3)",
+  },
+  mint: {
+    accent: "#10b981",
+    weak: "rgba(16,185,129,0.16)",
+    glow: "rgba(16,185,129,0.3)",
+  },
+} as const;
+
+function delay(ms: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+export default function Home() {
+  const [sourceText, setSourceText] =
+    useState<Record<SourceTab, string>>(initialSourceText);
+  const [activeTab, setActiveTab] = useState<SourceTab>("Transcript");
+  const [items, setItems] = useState<ConsultItem[]>([]);
+  const [stats, setStats] = useState<Stats>(emptyStats);
+  const [summary, setSummary] = useState<SummaryData | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isParsing, setIsParsing] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<(typeof viewTabs)[number]>("Board");
+  const [density, setDensity] = useState<"comfortable" | "compact">("comfortable");
+  const [accentTheme, setAccentTheme] =
+    useState<keyof typeof accentThemes>("blue");
+
+  const currentSourceText = sourceText[activeTab];
+  const selectedItem = useMemo(
+    () => items.find((item) => item.id === selectedId) ?? null,
+    [items, selectedId],
+  );
+  const transcriptHighlights = useMemo<InputHighlight[]>(
+    () =>
+      items
+        .filter((item) => item.quote)
+        .map((item) => ({
+          id: item.id,
+          kind: item.kind,
+          quote: item.quote ?? "",
+        })),
+    [items],
+  );
+  const densityClass =
+    density === "compact" ? "gap-3 p-3" : "gap-4 p-4";
+  const themeStyle = useMemo<CSSProperties>(
+    () =>
+      ({
+        "--accent": accentThemes[accentTheme].accent,
+        "--accent-weak": accentThemes[accentTheme].weak,
+        "--accent-glow": accentThemes[accentTheme].glow,
+      }) as CSSProperties,
+    [accentTheme],
+  );
+
+  const updateSourceText = useCallback(
+    (value: string) => {
+      setSourceText((current) => ({
+        ...current,
+        [activeTab]: value,
+      }));
+    },
+    [activeTab],
+  );
+
+  const handleTabChange = useCallback((tab: SourceTab) => {
+    setActiveTab(tab);
+    setErrorMessage(null);
+  }, []);
+
+  const handleBoardSelect = useCallback((id: string) => {
+    setSelectedId(id);
+  }, []);
+
+  const handleHighlightSelect = useCallback((id: string) => {
+    setActiveTab("Transcript");
+    setSelectedId(id);
+  }, []);
+
+  const handleBack = useCallback(() => {
+    setSelectedId(null);
+  }, []);
+
+  const generateSummary = useCallback(async (nextItems: ConsultItem[]) => {
+    if (nextItems.length === 0) {
+      setSummary(null);
+      setSummaryError(null);
+      return;
+    }
+
+    setSummaryError(null);
+
+    const response = await fetch("/api/summarize", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ items: nextItems }),
+    });
+
+    const payload = (await response.json()) as SummarizeResponse & { error?: string };
+
+    if (!response.ok) {
+      throw new Error(payload.error ?? "Failed to generate executive summary.");
+    }
+
+    setSummary(payload);
+  }, []);
+
+  const handleRegenerateSummary = useCallback(async () => {
+    if (items.length === 0 || isRegenerating || isParsing) {
+      return;
+    }
+
+    setIsRegenerating(true);
+
+    try {
+      await generateSummary(items);
+    } catch (error) {
+      setSummaryError(
+        error instanceof Error ? error.message : "Unexpected summarization error.",
+      );
+    } finally {
+      setIsRegenerating(false);
+    }
+  }, [generateSummary, isParsing, isRegenerating, items]);
+
+  const handleParse = useCallback(async () => {
+    const input = sourceText[activeTab].trim();
+
+    if (!input || isParsing) {
       return;
     }
 
     setIsParsing(true);
     setCurrentStep(0);
+    setErrorMessage(null);
+    setSummaryError(null);
+    setSelectedId(null);
+    setSummary(null);
 
-    window.setTimeout(() => setCurrentStep(1), 350);
-    window.setTimeout(() => setCurrentStep(2), 700);
-    window.setTimeout(() => setCurrentStep(3), 1050);
-    window.setTimeout(() => setIsParsing(false), 1500);
-  };
+    const stepTimers = loadingStepDurations.map((duration, index) =>
+      window.setTimeout(() => {
+        setCurrentStep(index + 1);
+      }, loadingStepDurations.slice(0, index + 1).reduce((sum, value) => sum + value, 0)),
+    );
+
+    try {
+      const [response] = await Promise.all([
+        fetch("/api/extract", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ input }),
+        }),
+        delay(1500),
+      ]);
+
+      const payload = (await response.json()) as ExtractResponse & { error?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Failed to extract structured items.");
+      }
+
+      setItems(payload.items);
+      setStats(payload.stats);
+
+      try {
+        await generateSummary(payload.items);
+      } catch (error) {
+        setSummaryError(
+          error instanceof Error ? error.message : "Unexpected summarization error.",
+        );
+      }
+    } catch (error) {
+      setItems([]);
+      setStats(emptyStats);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Unexpected extraction error.",
+      );
+    } finally {
+      stepTimers.forEach((timer) => window.clearTimeout(timer));
+      setIsParsing(false);
+      setCurrentStep(0);
+    }
+  }, [activeTab, generateSummary, isParsing, sourceText]);
 
   return (
-    <main className="relative h-screen overflow-hidden bg-bg p-3 text-fg">
+    <main
+      className="relative h-screen overflow-hidden bg-bg p-3 text-fg"
+      style={themeStyle}
+    >
       <div className="grid h-full grid-cols-[232px_1fr] overflow-hidden rounded-shell border border-line bg-bg">
         <Sidebar items={items} />
 
-        <section className="grid min-w-0 min-h-0 grid-rows-[44px_1fr]">
+        <section className="grid min-h-0 min-w-0 grid-rows-[44px_1fr]">
           <div className="flex items-center gap-3 border-b border-line px-4">
-            <div className="flex items-center gap-2 text-sm text-fg-dim">
-              <span>Acme Corp</span>
-              <span className="text-fg-faint">/</span>
-              <span className="text-fg">Q3 operating review</span>
+            <div>
+              <div className="flex items-center gap-2 text-sm text-fg-dim">
+                <span>Acme Corp</span>
+                <span className="text-fg-faint">/</span>
+                <span>Commercial strategy</span>
+                <span className="text-fg-faint">/</span>
+                <span className="text-fg">Q3 operating review</span>
+              </div>
+              <div className="mt-0.5 text-[11px] uppercase tracking-[0.14em] text-fg-faint">
+                Session · Steering sync 14
+              </div>
             </div>
             <div className="ml-auto flex items-center rounded-md border border-line bg-bg-1 p-1 text-xs text-fg-dim">
-              <button
-                type="button"
-                onClick={handleParse}
-                className="mr-2 rounded border border-line bg-bg-2 px-2 py-1 text-fg-dim transition hover:border-line-2 hover:text-fg"
-              >
-                Preview loading
-              </button>
-              <span className="rounded px-2 py-1 text-fg">Board</span>
-              <span className="px-2 py-1">List</span>
-              <span className="px-2 py-1">Timeline</span>
+              {viewTabs.map((tab) => {
+                const isActive = tab === activeView;
+
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setActiveView(tab)}
+                    className={`rounded px-2 py-1 transition ${
+                      isActive
+                        ? "bg-bg-2 text-fg shadow-[0_0_0_1px_var(--accent-glow)]"
+                        : "text-fg-dim hover:text-fg"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="grid min-h-0 min-w-0 grid-cols-[360px_1fr_300px] gap-4 p-4">
+          <div className={`grid min-h-0 min-w-0 grid-cols-[360px_1fr_300px] ${densityClass}`}>
             <div className="min-h-0">
               <InputPanel
-                value={sourceText}
-                onChange={setSourceText}
+                value={currentSourceText}
+                onChange={updateSourceText}
                 onParse={handleParse}
                 isParsing={isParsing}
                 activeTab={activeTab}
-                onTabChange={setActiveTab}
+                onTabChange={handleTabChange}
                 attn
+                highlights={transcriptHighlights}
+                onHighlightSelect={handleHighlightSelect}
               />
             </div>
 
-            <div className="panel flex min-h-0 flex-col overflow-hidden">
-              <div className="flex items-center justify-between border-b border-line px-5 py-4">
-                <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint">
-                    Workspace
-                  </div>
-                  <h2 className="mt-1 text-base font-semibold text-fg">
-                    Board placeholder
-                  </h2>
+            <div className="min-h-0">
+              <Board
+                items={items}
+                selectedId={selectedId}
+                onSelect={handleBoardSelect}
+                loading={isParsing}
+              />
+              {errorMessage ? (
+                <div className="mt-3 rounded-[8px] border border-[var(--danger-weak)] bg-[rgba(72,25,28,0.55)] px-3 py-2 text-sm text-danger">
+                  {errorMessage}
                 </div>
-                <div className="mono rounded-full border border-line bg-bg-2 px-2.5 py-1 text-[11px] text-fg-dim">
-                  {items.length} items
-                </div>
-              </div>
-              <div className="grid min-h-0 flex-1 grid-cols-3 gap-3 p-4">
-                {["Todo", "In progress", "Waiting"].map((column) => (
-                  <div
-                    key={column}
-                    className="flex min-h-0 flex-col rounded-[8px] border border-line bg-bg-1 p-3"
-                  >
-                    <div className="mb-3 flex items-center justify-between">
-                      <span className="text-sm font-semibold text-fg">{column}</span>
-                      <span className="text-xs text-fg-mute">
-                        {column === "Todo" ? 2 : 1}
-                      </span>
-                    </div>
-                    <div className="space-y-3">
-                      {[0, 1].map((index) => (
-                        <div
-                          key={`${column}-${index}`}
-                          className="animate-cardIn rounded-[8px] border border-line bg-bg-2 p-3"
-                        >
-                          <div className="mono text-[11px] text-fg-faint">
-                            {items[index]?.id ?? "ACM-000"}
-                          </div>
-                          <div className="mt-2 text-sm font-medium text-fg">
-                            Structured board cards will render here next.
-                          </div>
-                          <div className="mt-3 flex items-center gap-2 text-xs text-fg-dim">
-                            <span className="rounded-full bg-accent-weak px-2 py-1 text-accent">
-                              prototype
-                            </span>
-                            <span>{selectedId ? "selected" : "preview"}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              ) : null}
             </div>
 
-            <div className="panel flex min-h-0 flex-col overflow-hidden">
-              <div className="border-b border-line px-5 py-4">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint">
-                  Summary
+            <div className="min-h-0">
+              <RightPanel
+                items={items}
+                summary={summary}
+                selectedItem={selectedItem}
+                onBack={handleBack}
+                onRegenerate={handleRegenerateSummary}
+                isRegenerating={isRegenerating}
+              />
+              {summaryError ? (
+                <div className="mt-3 rounded-[8px] border border-[var(--warn-weak)] bg-[rgba(65,46,17,0.5)] px-3 py-2 text-sm text-warn">
+                  {summaryError}
                 </div>
-                <h2 className="mt-1 text-base font-semibold text-fg">
-                  Right panel placeholder
-                </h2>
-              </div>
-              <div className="space-y-4 overflow-y-auto p-4">
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { label: "Action items", value: "08" },
-                    { label: "Waiting", value: "02" },
-                    { label: "Blockers", value: "01" },
-                    { label: "Risks", value: "01" },
-                  ].map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="rounded-[8px] border border-line bg-bg-2 p-3"
-                    >
-                      <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
-                        {stat.label}
-                      </div>
-                      <div className="mt-2 text-2xl font-semibold text-fg">
-                        {stat.value}
-                      </div>
+              ) : null}
+              {stats.total > 0 ? (
+                <div className="mt-3 rounded-[8px] border border-line bg-bg-1 px-3 py-2 text-[11px] text-fg-dim">
+                  {stats.total} items parsed · {stats.waiting} waiting · {stats.blockers} blockers
+                  · {stats.risks} risks
+                </div>
+              ) : null}
+              <div className="mt-3 rounded-[8px] border border-line bg-bg-1 p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+                      Tweaks
                     </div>
-                  ))}
+                    <div className="mt-1 text-sm font-medium text-fg">
+                      Demo controls
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleParse}
+                    disabled={isParsing || currentSourceText.trim().length === 0}
+                    className="rounded-md border border-line bg-bg-2 px-2.5 py-1.5 text-[11px] text-fg-dim transition hover:border-line-2 hover:text-fg disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Replay parse
+                  </button>
                 </div>
 
-                <div className="rounded-[8px] border border-line bg-bg-2 p-4">
-                  <div className="text-sm font-semibold text-fg">
-                    Prototype notes
+                <div className="mt-4">
+                  <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+                    Accent
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-fg-dim">
-                    This prototype now shows the source panel, app shell, sidebar,
-                    and workspace layout. The AI extraction board and detailed
-                    right panel are still waiting on the schema-driven tasks.
-                  </p>
+                  <div className="mt-2 flex gap-2">
+                    {(Object.keys(accentThemes) as Array<keyof typeof accentThemes>).map(
+                      (theme) => (
+                        <button
+                          key={theme}
+                          type="button"
+                          onClick={() => setAccentTheme(theme)}
+                          className={`h-7 w-7 rounded-full border transition ${
+                            accentTheme === theme
+                              ? "border-fg shadow-[0_0_0_1px_var(--accent-glow)]"
+                              : "border-line hover:border-line-2"
+                          }`}
+                          style={{ backgroundColor: accentThemes[theme].accent }}
+                          aria-label={`Use ${theme} accent`}
+                        />
+                      ),
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+                    Density
+                  </div>
+                  <div className="mt-2 flex rounded-md border border-line bg-bg-2 p-1 text-[11px] text-fg-dim">
+                    {(["comfortable", "compact"] as const).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setDensity(mode)}
+                        className={`flex-1 rounded px-2 py-1 transition ${
+                          density === mode
+                            ? "bg-bg-3 text-fg"
+                            : "hover:text-fg"
+                        }`}
+                      >
+                        {mode === "comfortable" ? "Comfortable" : "Compact"}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
       </div>
+
       <LoadingOverlay visible={isParsing} currentStep={currentStep} />
     </main>
   );

@@ -1,6 +1,6 @@
 {
   "project": "ConsultFlow - AI Consulting Workflow Engine",
-  "last_updated": "2026-04-24T13:19:00+0800",
+  "last_updated": "2026-04-24T14:58:00+0800",
   "tasks": [
     {
       "id": "TASK-000",
@@ -197,14 +197,14 @@
     {
       "id": "TASK-012",
       "title": "Integrate parse flow into page.tsx",
-      "description": "Update web/app/page.tsx to wire up the full parse interaction: Re-parse/Parse button triggers POST /api/extract. Show LoadingOverlay with animated steps during request (simulate 4 steps over ~1.5s). On success, update items state and stats state. Render Sidebar, InputPanel, Board (with skeleton during load), RightPanel. Use useCallback and useState for items, stats, loading, selectedId, summary state.",
+      "description": "NOTE: page.tsx was accidentally reverted to the old prototype shell. Redo the full integration from scratch.\n\nReplace web/app/page.tsx with the complete integrated shell:\n1. Per-tab source text: replace single sourceText string with Record<SourceTab, string> (keys: Transcript/Email/Notes, initial value only on Transcript). Pass sourceText[activeTab] as value and update only the active key in onChange.\n2. Parse flow: Re-parse button triggers POST /api/extract with input: sourceText[activeTab]. Show LoadingOverlay with 4 animated steps over ~1.5s. On success update items and stats state.\n3. Render real Board and RightPanel components (not placeholders).\n4. Use useCallback and useState for items, stats, loading, selectedId, summary state.",
       "stage": "ingest",
       "owner": "codex",
       "status": "done",
       "dependencies": ["TASK-003", "TASK-005", "TASK-002", "TASK-020", "TASK-022", "TASK-019"],
-      "output": "Replaced the page placeholders with the real Board and RightPanel, wired parse requests to /api/extract with loading-overlay step animation, and now store extracted items, stats, and selection state in the app shell.",
+      "output": "Replaced the reverted prototype page with the integrated shell: per-tab source text state, extract API parsing flow with the staged loading overlay, live items/stats updates, and real Board and RightPanel rendering wired into page state.",
       "files": ["web/app/page.tsx"],
-      "updated_at": "2026-04-24T13:06:00+0800"
+      "updated_at": "2026-04-24T14:15:00+0800"
     },
     {
       "id": "TASK-013",
@@ -214,9 +214,9 @@
       "owner": "codex",
       "status": "done",
       "dependencies": ["TASK-006", "TASK-011", "TASK-012"],
-      "output": "After extraction, page.tsx now automatically requests /api/summarize, stores the returned executive summary/digest/provenance, and wires RightPanel regeneration for on-demand refresh.",
+      "output": "Extended page.tsx to automatically call /api/summarize after successful extraction, store the returned executive summary and client digest in page state, surface summary failures separately from extraction failures, and wire the RightPanel regenerate control to rerun summarization on demand.",
       "files": ["web/app/page.tsx"],
-      "updated_at": "2026-04-24T13:06:00+0800"
+      "updated_at": "2026-04-24T14:34:00+0800"
     },
     {
       "id": "TASK-014",
@@ -226,9 +226,9 @@
       "owner": "codex",
       "status": "done",
       "dependencies": ["TASK-013", "TASK-011", "TASK-005"],
-      "output": "Wired board card selection into page state and RightPanel detail mode, added Back-to-summary behavior, and made transcript quote highlights in InputPanel open the matching card detail directly.",
+      "output": "Wired page-level selection so board card clicks and transcript quote highlights both set selectedId, the matching ConsultItem is passed into RightPanel detail mode, and the Back action clears the selection to return to the executive summary view.",
       "files": ["web/app/page.tsx"],
-      "updated_at": "2026-04-24T13:19:00+0800"
+      "updated_at": "2026-04-24T14:40:00+0800"
     },
     {
       "id": "TASK-015",
@@ -236,11 +236,11 @@
       "description": "Final pass: (1) Topbar breadcrumbs showing engagement + session name, view tabs (Board/List/Timeline) with active state. (2) ⌘↵ keyboard shortcut triggers parse. (3) Highlight extracted quotes as colored spans in InputPanel transcript (task=accent, blocker=warn, risk=danger, waiting=info). Clicking a span opens the card detail. (4) Tweaks panel (accent color swatches, density toggle, replay parse button). (5) 'Share digest' button copies client digest to clipboard. (6) Empty states for Board and RightPanel when no items exist.",
       "stage": "communicate",
       "owner": "codex",
-      "status": "todo",
+      "status": "done",
       "dependencies": ["TASK-012", "TASK-013", "TASK-014"],
-      "output": "",
+      "output": "Polished the demo flow with breadcrumb/session topbar treatment, active view tabs, page-level tweaks controls for accent and density plus replay parse, explicit board and summary empty states, and a clearer Share digest control that copies the generated client digest.",
       "files": ["web/app/page.tsx", "web/components/InputPanel.tsx", "web/components/Board.tsx", "web/components/RightPanel.tsx"],
-      "updated_at": ""
+      "updated_at": "2026-04-24T14:52:00+0800"
     },
     {
       "id": "TASK-023",
@@ -281,6 +281,19 @@
       "output": "Added the email API route backed by the managed email agent, validating items/summary input, streaming the agent response, and returning parsed subject/body/tone JSON with route-level error handling.",
       "files": ["web/app/api/email/route.ts"],
       "updated_at": "2026-04-24T13:06:00+0800"
+    }
+  ,
+    {
+      "id": "TASK-026",
+      "title": "Wire mock responses into all three AI API routes",
+      "description": "web/lib/mocks.ts is already written (MOCK_ITEMS, MOCK_STATS, MOCK_SUMMARY, MOCK_EMAIL). Codex only needs to wire it into the three routes.\n\nIn each route, add a mock guard at the top of the handler:\n  if (process.env.MOCK_AI === 'true') { return NextResponse.json(<mock>) }\n\n- web/app/api/extract/route.ts: return NextResponse.json({ items: MOCK_ITEMS, stats: MOCK_STATS })\n- web/app/api/summarize/route.ts: return NextResponse.json(MOCK_SUMMARY)\n- web/app/api/email/route.ts: return NextResponse.json(MOCK_EMAIL)\n\nAlso add MOCK_AI=true to web/.env.local.",
+      "stage": "plan",
+      "owner": "codex",
+      "status": "done",
+      "dependencies": ["TASK-003", "TASK-006", "TASK-025"],
+      "output": "Added MOCK_AI guards to the extract, summarize, and email API routes so local development can short-circuit to the existing mock payloads, and enabled MOCK_AI=true in web/.env.local.",
+      "files": ["web/app/api/extract/route.ts", "web/app/api/summarize/route.ts", "web/app/api/email/route.ts", "web/.env.local"],
+      "updated_at": "2026-04-24T14:58:00+0800"
     }
   ]
 }

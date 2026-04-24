@@ -5,6 +5,7 @@ import {
   parseJSONResponse,
   runManagedAgent,
 } from "@/lib/managedAgents";
+import { MOCK_ITEMS, MOCK_STATS } from "@/lib/mocks";
 import type { ConsultItem, ExtractResponse, Stats } from "@/types/schema";
 
 function buildStats(items: ConsultItem[]): Stats {
@@ -18,6 +19,10 @@ function buildStats(items: ConsultItem[]): Stats {
 
 export async function POST(request: Request) {
   try {
+    if (process.env.MOCK_AI === "true") {
+      return NextResponse.json({ items: MOCK_ITEMS, stats: MOCK_STATS });
+    }
+
     const body = (await request.json()) as { input?: string };
     const input = body.input?.trim();
 

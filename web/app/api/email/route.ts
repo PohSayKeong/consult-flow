@@ -5,6 +5,7 @@ import {
   parseJSONResponse,
   runManagedAgent,
 } from "@/lib/managedAgents";
+import { MOCK_EMAIL } from "@/lib/mocks";
 import type { ConsultItem, SummaryData } from "@/types/schema";
 
 type EmailResponse = {
@@ -15,6 +16,10 @@ type EmailResponse = {
 
 export async function POST(request: Request) {
   try {
+    if (process.env.MOCK_AI === "true") {
+      return NextResponse.json(MOCK_EMAIL);
+    }
+
     const body = (await request.json()) as {
       items?: ConsultItem[];
       summary?: SummaryData;

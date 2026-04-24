@@ -78,6 +78,25 @@ function SummaryMode({
   items: ConsultItem[];
   summary: SummaryData | null;
 }) {
+  if (items.length === 0) {
+    return (
+      <div className="grid min-h-full place-items-center p-5">
+        <div className="max-w-[240px] rounded-xl border border-dashed border-line bg-bg-1 p-5 text-center">
+          <div className="text-[11px] uppercase tracking-[0.12em] text-fg-faint">
+            Empty summary
+          </div>
+          <div className="mt-2 text-base font-semibold text-fg">
+            Nothing to summarize yet
+          </div>
+          <p className="mt-3 text-sm leading-6 text-fg-dim">
+            Run extraction from the source panel to generate an executive summary, digest,
+            and provenance notes for this session.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const total = items.length;
   const waiting = items.filter((item) => item.waiting).length;
   const blockers = items.filter((item) => item.kind === "blocker").length;
@@ -381,7 +400,7 @@ export default function RightPanel({
                 className="rounded-md border border-line bg-bg-1 px-2 py-1 text-[11px] transition hover:border-line-2 hover:text-fg disabled:cursor-not-allowed disabled:opacity-50"
                 title={shared ? "Digest copied" : "Share digest"}
               >
-                {shared ? "Shared" : "Share"}
+                {shared ? "Shared digest" : "Share digest"}
               </button>
               <button
                 type="button"

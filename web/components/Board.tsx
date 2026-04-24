@@ -44,6 +44,37 @@ export default function Board({
   onSelect,
   loading = false,
 }: BoardProps) {
+  if (!loading && items.length === 0) {
+    return (
+      <section className="panel flex h-full min-h-0 flex-col overflow-hidden">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint">
+              Workspace
+            </div>
+            <h2 className="mt-1 text-base font-semibold text-fg">Extracted items</h2>
+          </div>
+          <div className="text-[11px] text-fg-mute">0 total</div>
+        </div>
+
+        <div className="grid min-h-0 flex-1 place-items-center p-6">
+          <div className="max-w-[320px] rounded-xl border border-dashed border-line bg-bg-1 p-6 text-center">
+            <div className="text-[11px] uppercase tracking-[0.14em] text-fg-faint">
+              Empty board
+            </div>
+            <div className="mt-2 text-lg font-semibold text-fg">
+              Parse a source to populate the board
+            </div>
+            <p className="mt-3 text-sm leading-6 text-fg-dim">
+              Action items, blockers, risks, and client dependencies will land here as
+              structured cards after extraction runs.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="panel flex h-full min-h-0 flex-col overflow-hidden">
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
